@@ -1,8 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
-
-def nueva_archivo():
-    messagebox.showinfo("Importar", "Importar archivo.")
+import file
 
 def salir_app():
     root.quit()
@@ -20,7 +18,7 @@ barra_menu = tk.Menu(root)
 
 # Crear un menú "Archivo"
 menu_archivo = tk.Menu(barra_menu, tearoff=0)
-menu_archivo.add_command(label="Importar", command=nueva_archivo)
+menu_archivo.add_command(label="Importar", command=file.nueva_archivo)
 menu_archivo.add_separator()
 menu_archivo.add_command(label="Salir", command=salir_app)
 
