@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 import file
 
+
 def salir_app():
     root.quit()
 
