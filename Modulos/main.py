@@ -20,6 +20,7 @@ barra_menu = tk.Menu(root)
 # Crear un menú "Archivo"
 menu_archivo = tk.Menu(barra_menu, tearoff=0)
 menu_archivo.add_command(label="Importar", command=file.nueva_archivo)
+#menu_archivo.add_command(label="Abrir base de datos", command=file.obtener_informacion_bd('bd'))
 menu_archivo.add_separator()
 menu_archivo.add_command(label="Salir", command=salir_app)
 
