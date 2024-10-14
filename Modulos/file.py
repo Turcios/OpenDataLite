@@ -4,7 +4,7 @@ import pandas as pd
 import sqlite3
 
 # Función para abrir una nueva ventana después de cargar el archivo
-def abrir_nueva_ventana(file_path):
+def abrir_nueva_ventana(file_path, frame_izquierdo):
     nueva_ventana = tk.Toplevel();
     # Crear nueva ventana
     nueva_ventana.title("OpenDataLite")
@@ -41,11 +41,11 @@ def abrir_nueva_ventana(file_path):
     label_contenido.pack(pady=10)
 
     # Botón de enviar
-    boton_enviar = tk.Button(nueva_ventana, text="Enviar", command=lambda: mostrar_datos(entry_nombre_bd.get(), entry_nombre_tabla.get(), file_path, nueva_ventana))
+    boton_enviar = tk.Button(nueva_ventana, text="Enviar", command=lambda: mostrar_datos(entry_nombre_bd.get(), entry_nombre_tabla.get(), file_path,frame_izquierdo,nueva_ventana))
     boton_enviar.pack(pady=10)
 
 # Función para mostrar los datos ingresados en el formulario
-def mostrar_datos(nombre_bd,nombre_tabla,file_path,nueva_ventana):
+def mostrar_datos(nombre_bd,nombre_tabla,file_path,frame_izquierdo,nueva_ventana):
     if file_path:
         try:
             # Leer el CSV con pandas
@@ -64,7 +64,7 @@ def mostrar_datos(nombre_bd,nombre_tabla,file_path,nueva_ventana):
             messagebox.showinfo("Éxito", "El archivo CSV ha sido cargado en la base de datos correctamente.")
 
             # Mostrar la estructura de la tabla
-            mostrar_estructura(nombre_bd+".db")
+            mostrar_estructura(nombre_bd+".db", frame_izquierdo)
 
         except Exception as e:
             # Mostrar un mensaje de error si algo falla
@@ -73,36 +73,35 @@ def mostrar_datos(nombre_bd,nombre_tabla,file_path,nueva_ventana):
     #cierra la ventana al enviar los datos
     nueva_ventana.destroy()
     
-def nueva_archivo():
+def nueva_archivo(frame_izquierdo):
     file_path = filedialog.askopenfilename(
     title="Seleccionar archivo CSV",
     filetypes=[("CSV files", "*.csv")]  # Limita a solo archivos CSV
     )
     # Verificar si se seleccionó un archivo
     if file_path:
-        # Abrir y leer el archivo CSV
-        with open(file_path, 'r') as file:
-            content = file.read()
-            print("Contenido del archivo CSV:")
-            print(content)
-            abrir_nueva_ventana(file_path)  # Llamar a la función para abrir la nueva ventana
+        # Llamar a la función para abrir la nueva ventana
+        abrir_nueva_ventana(file_path, frame_izquierdo)
     else:
         print("No se seleccionó ningún archivo.")
 
 
     # Función para mostrar la estructura de la base de datos en una nueva ventana
-def mostrar_estructura(nombre_bd):
-    # Crear una nueva ventana para mostrar la estructura
-    ventana_estructura = tk.Toplevel()
-    ventana_estructura.title(f"Estructura de la Base de Datos: {nombre_bd}")
-    ventana_estructura.geometry("600x400")
-    
+def mostrar_estructura(nombre_bd, frame_izquierdo):
+    # Limpiar el frame izquierdo antes de cargar la nueva estructura
+    for widget in frame_izquierdo.winfo_children():
+        widget.destroy()
+
+    # Crear una etiqueta de título en el frame izquierdo
+    label_estructura = tk.Label(frame_izquierdo, text=f"Estructura: {nombre_bd}")
+    label_estructura.pack(pady=5)
+
     # Crear un Treeview para mostrar la estructura de la base de datos
-    treeview = ttk.Treeview(ventana_estructura)
+    treeview = ttk.Treeview(frame_izquierdo)
     treeview.pack(expand=True, fill="both", padx=10, pady=10)
     
     # Crear la columna principal del Treeview
-    treeview.heading("#0", text=nombre_bd[:-3], anchor="w")
+    treeview.heading("#0", text="Tablas", anchor="w")
 
     # Conectar a la base de datos y obtener la información de las tablas
     conexion = sqlite3.connect(nombre_bd)
