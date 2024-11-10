@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import messagebox, Text, Frame, END
 from tkinter import ttk  # Importamos ttk para el Treeview
 import file  # Archivo file.py que contiene funciones relacionadas con la carga de archivos y BD
-import database  # Archivo database.py que contiene la función ejecutar_consulta
 import sqlite3
 
 def salir_app():
@@ -90,10 +89,6 @@ frame_derecho.pack(side="right", fill="both", expand=True)
 label_izquierda = tk.Label(frame_izquierdo, text="Estructura")
 label_izquierda.pack(pady=10)
 
-# Crear una etiqueta temporal en el frame derecho para otros datos
-label_derecha = tk.Label(frame_derecho, text="Consultas")
-label_derecha.pack(pady=10)
-
 # Caja de texto para la consulta SQL
 caja_texto = Text(frame_derecho, wrap='word', height=10)
 caja_texto.pack(expand=True, fill='both', padx=10, pady=10)
@@ -128,12 +123,30 @@ barra_menu = tk.Menu(root)
 
 
 menu_archivo = tk.Menu(barra_menu, tearoff=0)
-menu_archivo.add_command(label="Importar", command=lambda: file.nueva_archivo(frame_izquierdo))
+
+
+menu_importar = tk.Menu(menu_archivo, tearoff=0)
+menu_importar.add_command(label="Base de datos existente", command=lambda: file.nueva_archivo(frame_izquierdo, 1))
+menu_importar.add_command(label="Nueva base de datos", command=lambda: file.nueva_archivo(frame_izquierdo, 2))
+
+# Agregar el submenú "Importar" al menú "Archivo"
+menu_archivo.add_cascade(label="Importar", menu=menu_importar)
 menu_archivo.add_separator()
+
 menu_archivo.add_command(label="Salir", command=salir_app)
 
 # Añadir el menú "Archivo" a la barra de menú
 barra_menu.add_cascade(label="Archivo", menu=menu_archivo)
+
+# Crear un menú "Consulta"
+menu_consulta= tk.Menu(barra_menu, tearoff=0)
+
+# Agregar opciones al menú de "Consulta"
+menu_consulta.add_command(label="Generar consultas", command=lambda: print("Generar consultas"))
+menu_consulta.add_command(label="Asistente de consultas", command=lambda: print("Asistente de consultas"))
+
+# Añadir el menú "Consultas" a la barra de menú
+barra_menu.add_cascade(label="Consultas", menu=menu_consulta)
 
 # Crear un menú "Ayuda"
 menu_ayuda = tk.Menu(barra_menu, tearoff=0)
