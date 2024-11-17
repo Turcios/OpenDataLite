@@ -2,11 +2,12 @@ import tkinter as tk
 from tkinter import messagebox, filedialog, ttk
 import pandas as pd
 import sqlite3
+import os
 
 # Variables globales para almacenar la base de datos y tabla cargadas
 db_context = {"nombre_bd": None, "nombre_tabla": None}
 
-# Función para abrir una nueva ventana después de cargar el archivo
+# Función para abrir una nueva ventana después de cargar el archivo, base de datos nueva
 def abrir_nueva_ventana(file_path, frame_izquierdo):
     nueva_ventana = tk.Toplevel()
     nueva_ventana.title("OpenDataLite")
@@ -23,7 +24,7 @@ def abrir_nueva_ventana(file_path, frame_izquierdo):
      # Etiqueta de campo del nombre de la base de datos
     label_nombre_bd = tk.Label(nueva_ventana, text="Nombre base de datos:")
     label_nombre_bd.pack(pady=5)
-
+   
     # Entrada de texto para el nombre
     entry_nombre_bd = tk.Entry(nueva_ventana)
     entry_nombre_bd.pack(pady=5)
@@ -71,13 +72,46 @@ def mostrar_datos(nombre_bd, nombre_tabla, file_path, frame_izquierdo, nueva_ven
 def obtener_contexto():
     return db_context
 
-def nueva_archivo(frame_izquierdo):
-    file_path = filedialog.askopenfilename(title="Seleccionar archivo CSV", filetypes=[("CSV files", "*.csv")])
+#Carga una base de datos existente
+def cargar_base(ruta_bd, frame_izquierdo):
+    try:
+
+         # Obtener el nombre de la base de datos a partir de la ruta
+        nombre_bd = os.path.basename(ruta_bd)
+
+        # Conectar a la base de datos
+        conexion = sqlite3.connect(ruta_bd)
+        print("Conexión exitosa a la base de datos")
+        
+        # Cargar el archivo CSV en un DataFrame de pandas
+        datos_csv = filedialog.askopenfilename(title="Seleccionar archivo CSV", filetypes=[("CSV files", "*.csv")])
+        df = pd.read_csv(datos_csv, on_bad_lines='skip')
+        df.to_sql('personas', conexion, if_exists='replace', index=False)
+        print(f"Archivo CSV cargado con éxito con {len(datos_csv)} registros")
+           
+        print("Datos agregados a la tabla en la base de datos")
+        
+    except Exception as e:
+        print(f"Error al agregar el CSV a la base de datos: {e}")
+    finally:
+        if conexion:
+            conexion.close()
+            print("Conexión cerrada")
+            mostrar_estructura(ruta_bd, frame_izquierdo)
+    
+def nueva_archivo(frame_izquierdo, tipo):
+    print(tipo)
+    if tipo == 1:
+        file_path = filedialog.askopenfilename(title="Seleccionar archivo db", filetypes=[("db files", "*.db")])
+    else:
+       file_path = filedialog.askopenfilename(title="Seleccionar archivo CSV", filetypes=[("CSV files", "*.csv")])
     if file_path:
-        abrir_nueva_ventana(file_path, frame_izquierdo)
+        if tipo == 1:
+           cargar_base(file_path, frame_izquierdo)
+        else:
+            abrir_nueva_ventana(file_path, frame_izquierdo)
     else:
         print("No se seleccionó ningún archivo.")
-
 
  # Función para mostrar la estructura de la base de datos en una nueva ventana
 def mostrar_estructura(nombre_bd, frame_izquierdo):
