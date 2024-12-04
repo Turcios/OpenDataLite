@@ -3,6 +3,7 @@ from tkinter import messagebox, Text, Frame, END
 from tkinter import ttk  # Importamos ttk para el Treeview
 import file  # Archivo file.py que contiene funciones relacionadas con la carga de archivos y BD
 import sqlite3
+import asistente  # Archivo asistente.py que contiene funciones relacionadas con a asistente para gráficos
 
 def salir_app():
     root.quit()
@@ -143,7 +144,7 @@ menu_consulta= tk.Menu(barra_menu, tearoff=0)
 
 # Agregar opciones al menú de "Consulta"
 menu_consulta.add_command(label="Generar consultas", command=lambda: print("Generar consultas"))
-menu_consulta.add_command(label="Asistente de consultas", command=lambda: print("Asistente de consultas"))
+menu_consulta.add_command(label="Asistente de consultas", command=lambda: asistente.abrir_wizard())
 
 # Añadir el menú "Consultas" a la barra de menú
 barra_menu.add_cascade(label="Consultas", menu=menu_consulta)

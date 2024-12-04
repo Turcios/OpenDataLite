@@ -6,3 +6,7 @@ En este proyecto, se desarrollará una aplicación de escritorio de código abie
  
  # Actualizar el pip
  python.exe -m pip install --upgrade pip
+
+ # Instalar matplotlib
+
+ pip install matplotlib
