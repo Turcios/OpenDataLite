@@ -2,7 +2,8 @@ import tkinter as tk
 from tkinter import messagebox, filedialog, ttk
 import pandas as pd
 import sqlite3
-import os
+#import os
+import variable
 
 # Variables globales 
 db_context = {"nombre_bd": None, "nombre_tabla": None, "ruta_bd":None, "ruta_csv":None}
@@ -10,17 +11,17 @@ db_context = {"nombre_bd": None, "nombre_tabla": None, "ruta_bd":None, "ruta_csv
 # Función para seleccionar un archivo SQLite y cargar las tablas en un combobox
 def seleccionar_archivo_bd(tipo):
     if tipo==1:
-        ruta_bd = filedialog.askopenfilename(title="Seleccionar archivo SQLite", filetypes=[("Archivos SQLite", "*.db")])
+        ruta_bd = filedialog.askopenfilename(title=variable.idioma_actual["seleccionar_archivo_bd"], filetypes=[("Archivos SQLite", "*.db")])
         if ruta_bd:
             db_context["ruta_db"] =ruta_bd
         else:
-            db_context["ruta_db"] ="No se seleccionó ningún archivo."
+            db_context["ruta_db"] =variable.idioma_actual["no_seleccion_archivo"]
     else:
-        ruta_bd = filedialog.askopenfilename(title="Seleccionar archivo CSV", filetypes=[("CSV files", "*.csv")])
+        ruta_bd = filedialog.askopenfilename(title=variable.idioma_actual["seleccionar_csv"], filetypes=[("CSV files", "*.csv")])
         if ruta_bd:
             db_context["ruta_csv"] =ruta_bd
         else:
-            db_context["ruta_csv"] ="No se seleccionó ningún archivo."
+            db_context["ruta_csv"] =variable.idioma_actual["no_seleccion_archivo"]
 
 # Función para abrir una nueva ventana después de cargar el archivo, base de datos nueva
 def abrir_nueva_ventana(frame_izquierdo):
@@ -37,7 +38,7 @@ def abrir_nueva_ventana(frame_izquierdo):
     nueva_ventana.geometry(f"{ancho_ventana}x{alto_ventana}+{x_ventana}+{y_ventana}")
 
      # Etiqueta de campo del nombre de la base de datos
-    label_nombre_bd = tk.Label(nueva_ventana, text="Nombre base de datos:")
+    label_nombre_bd = tk.Label(nueva_ventana, text=variable.idioma_actual["nombre_base_datos"])
     label_nombre_bd.pack(pady=5)
    
     # Entrada de texto para el nombre
@@ -45,7 +46,7 @@ def abrir_nueva_ventana(frame_izquierdo):
     entry_nombre_bd.pack(pady=5)
 
     # Etiqueta de campo del nombre de la tabla
-    label_nombre_tabla = tk.Label(nueva_ventana, text="Nombre de la tabla")
+    label_nombre_tabla = tk.Label(nueva_ventana, text=variable.idioma_actual["nombre_tabla"])
     label_nombre_tabla.pack(pady=5)
 
     # Entrada de texto para el nombre
@@ -53,14 +54,14 @@ def abrir_nueva_ventana(frame_izquierdo):
     entry_nombre_tabla.pack(pady=5)  
 
     # Etiqueta para seleccionar el archivo de CSV
-    label_nombre_bd = tk.Label(nueva_ventana, text="Base de archivo CSV:")
+    label_nombre_bd = tk.Label(nueva_ventana, text=variable.idioma_actual["base_archivo_csv"]+":") 
     label_nombre_bd.pack(pady=5)
-    boton_seleccionar_bd = tk.Button(nueva_ventana, text="Seleccionar CSV", command=lambda: seleccionar_archivo_bd(2))
+    boton_seleccionar_bd = tk.Button(nueva_ventana, text=variable.idioma_actual["seleccionar_csv"], command=lambda: seleccionar_archivo_bd(2))
     boton_seleccionar_bd.pack(pady=5)  
 
     boton_enviar = tk.Button(
         nueva_ventana, 
-        text="Enviar", 
+        text=variable.idioma_actual[variable.idioma_actual["enviar"]], 
         command=lambda: mostrar_datos(entry_nombre_bd.get(), entry_nombre_tabla.get(), frame_izquierdo, nueva_ventana)
     )
     boton_enviar.pack(pady=10)
@@ -75,7 +76,7 @@ def mostrar_datos(nombre_bd, nombre_tabla, frame_izquierdo, nueva_ventana):
             df.to_sql(nombre_tabla, conexion, if_exists='replace', index=False)
             conexion.close()
 
-            messagebox.showinfo("Éxito", "El archivo CSV ha sido cargado en la base de datos correctamente.")
+            messagebox.showinfo(variable.idioma_actual["exito"], variable.idioma_actual["mensaje_exito_csv"])
             mostrar_estructura(nombre_bd + ".db", frame_izquierdo)
 
             # Guardar el contexto actual de la base de datos y la tabla
@@ -83,9 +84,9 @@ def mostrar_datos(nombre_bd, nombre_tabla, frame_izquierdo, nueva_ventana):
             db_context["nombre_tabla"] = nombre_tabla
 
         except pd.errors.ParserError as e:
-            messagebox.showerror("Error", f"Error al cargar el archivo: formato incorrecto en alguna línea.\n{e}")
+            messagebox.showerror("Error", f"{variable.idioma_actual["mensaje_error_carga_linea"]}.\n{e}")
         except Exception as e:
-            messagebox.showerror("Error", f"Error al cargar el archivo: {e}")
+            messagebox.showerror("Error", f"{variable.idioma_actual["mensaje_error_carga"]}: {e}")
 
     nueva_ventana.destroy()
 
@@ -121,19 +122,19 @@ def cargar_base(frame_izquierdo):
     ventana_carga.geometry(f"{ancho_ventana}x{alto_ventana}+{x_ventana}+{y_ventana}")
 
      # Etiqueta para seleccionar el archivo de la base de datos
-    label_nombre_bd = tk.Label(ventana_carga, text="Base de datos:")
+    label_nombre_bd = tk.Label(ventana_carga, text=variable.idioma_actual["base_datos"] )
     label_nombre_bd.pack(pady=5)
-    boton_seleccionar_bd = tk.Button(ventana_carga, text="Seleccionar base de datos", command=lambda: seleccionar_archivo_bd(1))
+    boton_seleccionar_bd = tk.Button(ventana_carga, text=variable.idioma_actual["seleccionar_db"], command=lambda: seleccionar_archivo_bd(1))
     boton_seleccionar_bd.pack(pady=5)  
 
   # Etiqueta para seleccionar el archivo de la base de datos
-    label_nombre_bd = tk.Label(ventana_carga, text="Base de archivo CSV:")
+    label_nombre_bd = tk.Label(ventana_carga, text=variable.idioma_actual["seleccionar_db"])
     label_nombre_bd.pack(pady=5)
-    boton_seleccionar_bd = tk.Button(ventana_carga, text="Seleccionar CSV", command=lambda: seleccionar_archivo_bd(2))
+    boton_seleccionar_bd = tk.Button(ventana_carga, text=variable.idioma_actual["seleccionar_csv"], command=lambda: seleccionar_archivo_bd(2))
     boton_seleccionar_bd.pack(pady=5)  
 
     # Etiqueta de campo del nombre de la tabla
-    label_nombre_tabla = tk.Label(ventana_carga, text="Nombre de la tabla")
+    label_nombre_tabla = tk.Label(ventana_carga, text=variable.idioma_actual["nombre_tabla"])
     label_nombre_tabla.pack(pady=5)
 
     # Entrada de texto para el nombre
@@ -143,7 +144,7 @@ def cargar_base(frame_izquierdo):
    
     boton_enviar = tk.Button(
         ventana_carga, 
-        text="Enviar", 
+        text=variable.idioma_actual["enviar"], 
         command=lambda:cargar_csv_bd(frame_izquierdo,entry_nombre_tabla.get(),ventana_carga)
     )
     boton_enviar.pack(pady=10)
@@ -162,7 +163,7 @@ def mostrar_estructura(nombre_bd, frame_izquierdo):
         widget.destroy()
 
  # Crear una etiqueta de título en el frame izquierdo
-    label_estructura = tk.Label(frame_izquierdo, text=f"Estructura: {nombre_bd}")
+    label_estructura = tk.Label(frame_izquierdo, text=f"{variable.idioma_actual['estructura']}: {nombre_bd}" )
     label_estructura.pack(pady=5)
 
 # Crear un Treeview para mostrar la estructura de la base de datos

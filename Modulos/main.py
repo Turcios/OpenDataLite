@@ -4,6 +4,16 @@ from tkinter import ttk  # Importamos ttk para el Treeview
 import file  # Archivo file.py que contiene funciones relacionadas con la carga de archivos y BD
 import sqlite3
 import asistente  # Archivo asistente.py que contiene funciones relacionadas con a asistente para gráficos
+import json
+import variable
+
+# Cargar el archivo de idiomas
+def cargar_idioma(idioma):
+    with open("C:/Users/keren/Desktop/Python/OpenDataLite/language/languages.json", "r", encoding="utf-8") as f:
+        return json.load(f).get(idioma, {})
+
+# Seleccionar el idioma inicial (predeterminado: español)
+variable.idioma_actual = cargar_idioma("en")
 
 def salir_app():
     root.quit()
