@@ -61,7 +61,7 @@ def abrir_nueva_ventana(frame_izquierdo):
 
     boton_enviar = tk.Button(
         nueva_ventana, 
-        text=variable.idioma_actual[variable.idioma_actual["enviar"]], 
+        text=variable.idioma_actual["enviar"], 
         command=lambda: mostrar_datos(entry_nombre_bd.get(), entry_nombre_tabla.get(), frame_izquierdo, nueva_ventana)
     )
     boton_enviar.pack(pady=10)
