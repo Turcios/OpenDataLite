@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import messagebox, filedialog, ttk
 import pandas as pd
 import sqlite3
-#import os
 import variable
 
 # Variables globales 

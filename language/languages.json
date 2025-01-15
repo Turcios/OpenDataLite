@@ -14,7 +14,10 @@
         "error": "Error",
         "estructura": "Estructura",
         "base_datos": "Base de datos",
-        "seleccionar_db": "Seleccionar base de datos"
+        "seleccionar_db": "Seleccionar base de datos",
+        "archivo": "Archivo",
+        "consulta": "Consultas",
+        "ayuda": "Ayuda"
     },
     "en": {
         "seleccionar_archivo_bd": "Select SQLite file",
@@ -31,6 +34,10 @@
         "error": "Error",
         "estructura": "Structure",
         "base_datos": "Database",
-        "seleccionar_db": "Select database"
+        "seleccionar_db": "Select database",
+        "archivo": "File",
+        "consulta": "Queries",
+        "ayuda": "Help"
+
     }
 }

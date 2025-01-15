@@ -1,2 +1,2 @@
 # globales.py
-idioma_actual = "en"  # Variable global de lenguaje
+idioma_actual = "es"  # Variable global de lenguaje
