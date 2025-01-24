@@ -9,14 +9,30 @@ import variable
 import util
 
 # Cargar el archivo de idiomas
-util.cambiar_idioma ("en")
+util.cambiar_idioma ("es")
 # Función para actualizar el idioma de toda la interfaz
 def actualizar_textos():
     # Actualizar textos de la barra de menú
     barra_menu.delete(0, "end")  # Borra los menús actuales
+    menu_archivo.delete(0, "end")
+    menu_importar.delete(0, "end")
+    menu_consulta.delete(0, "end")
+    menu_languaje.delete(0, "end")
+    menu_ayuda.delete(0, "end")
     barra_menu.add_cascade(label=variable.idioma_actual["archivo"], menu=menu_archivo)
     barra_menu.add_cascade(label=variable.idioma_actual["consulta"], menu=menu_consulta)
     barra_menu.add_cascade(label=variable.idioma_actual["ayuda"], menu=menu_ayuda)
+    menu_archivo.add_cascade(label=variable.idioma_actual["importar"], menu=menu_importar)
+    menu_ayuda.add_cascade(label=variable.idioma_actual["lenguaje"], menu=menu_languaje)
+    menu_importar.add_command(label=variable.idioma_actual["bd_existente"], command=lambda: file.nueva_archivo(frame_izquierdo, 1))
+    menu_importar.add_command(label=variable.idioma_actual["nueva_bd"], command=lambda: file.nueva_archivo(frame_izquierdo, 2))
+    menu_archivo.add_command(label=variable.idioma_actual["salir"] , command=salir_app)
+    menu_consulta.add_command(label=variable.idioma_actual["generar_consultas"], command=lambda: print("Generar consultas"))
+    menu_consulta.add_command(label=variable.idioma_actual["asistente_consultas"], command=lambda: asistente.abrir_wizard()) 
+    menu_languaje.add_command(label=variable.idioma_actual["español"], command=lambda: cambiar_idioma("es"))
+    menu_languaje.add_command(label=variable.idioma_actual["ingles"], command=lambda: cambiar_idioma("en"))
+    menu_ayuda.add_command(label=variable.idioma_actual["acerca"])
+    
 
 def cambiar_idioma(idioma):
     util.cambiar_idioma(idioma)
@@ -144,14 +160,14 @@ menu_archivo = tk.Menu(barra_menu, tearoff=0)
 
 
 menu_importar = tk.Menu(menu_archivo, tearoff=0)
-menu_importar.add_command(label="Base de datos existente", command=lambda: file.nueva_archivo(frame_izquierdo, 1))
-menu_importar.add_command(label="Nueva base de datos", command=lambda: file.nueva_archivo(frame_izquierdo, 2))
+menu_importar.add_command(label=variable.idioma_actual["bd_existente"], command=lambda: file.nueva_archivo(frame_izquierdo, 1))
+menu_importar.add_command(label=variable.idioma_actual["nueva_bd"], command=lambda: file.nueva_archivo(frame_izquierdo, 2))
 
 # Agregar el submenú "Importar" al menú "Archivo"
-menu_archivo.add_cascade(label="Importar", menu=menu_importar)
+menu_archivo.add_cascade(label=variable.idioma_actual["importar"], menu=menu_importar)
 menu_archivo.add_separator()
 
-menu_archivo.add_command(label="Salir", command=salir_app)
+menu_archivo.add_command(label=variable.idioma_actual["salir"], command=salir_app)
 
 # Añadir el menú "Archivo" a la barra de menú
 barra_menu.add_cascade(label=variable.idioma_actual["archivo"], menu=menu_archivo)
@@ -160,26 +176,26 @@ barra_menu.add_cascade(label=variable.idioma_actual["archivo"], menu=menu_archiv
 menu_consulta= tk.Menu(barra_menu, tearoff=0)
 
 # Agregar opciones al menú de "Consulta"
-menu_consulta.add_command(label="Generar consultas", command=lambda: print("Generar consultas"))
-menu_consulta.add_command(label="Asistente de consultas", command=lambda: asistente.abrir_wizard())
+menu_consulta.add_command(label=variable.idioma_actual["generar_consultas"], command=lambda: print("Generar consultas"))
+menu_consulta.add_command(label=variable.idioma_actual["asistente_consultas"], command=lambda: asistente.abrir_wizard())
 
 # Añadir el menú "Consultas" a la barra de menú
 barra_menu.add_cascade(label=variable.idioma_actual["consulta"], menu=menu_consulta)
 
 # Crear un menú "Ayuda"
 menu_ayuda = tk.Menu(barra_menu, tearoff=0)
-menu_ayuda.add_command(label="Acerca de", command=acerca_de)
+menu_ayuda.add_command(label=variable.idioma_actual["acerca"], command=acerca_de)
 
 # Añadir el menú "Ayuda" a la barra de menú
 barra_menu.add_cascade(label=variable.idioma_actual["ayuda"], menu=menu_ayuda)
 
 menu_languaje = tk.Menu(menu_archivo, tearoff=0)
 
-menu_languaje.add_command(label="Español", command=lambda: cambiar_idioma("es"))
-menu_languaje.add_command(label="Ingles", command=lambda: cambiar_idioma("en"))
+menu_languaje.add_command(label=variable.idioma_actual["español"], command=lambda: cambiar_idioma("es"))
+menu_languaje.add_command(label=variable.idioma_actual["ingles"], command=lambda: cambiar_idioma("en"))
 
 # Agregar el submenú "Lenguaje" al menú "es -en"
-menu_ayuda.add_cascade(label="Lenguaje", menu=menu_languaje)
+menu_ayuda.add_cascade(label=variable.idioma_actual["lenguaje"], menu=menu_languaje)
 
 # Configurar la ventana para que use la barra de menú
 root.config(menu=barra_menu)

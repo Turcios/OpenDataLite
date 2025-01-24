@@ -1,6 +1,6 @@
 {
     "es": {
-        "s.eleccionar_archivo_bd": "Seleccionar archivo SQLite",
+        "seleccionar_archivo_bd": "Seleccionar archivo SQLite",
         "no_seleccion_archivo": "No se seleccionó ningún archivo.",
         "seleccionar_csv": "Seleccionar archivo CSV",
         "mensaje_exito_csv": "El archivo CSV ha sido cargado en la base de datos correctamente.",
@@ -17,7 +17,17 @@
         "seleccionar_db": "Seleccionar base de datos",
         "archivo": "Archivo",
         "consulta": "Consultas",
-        "ayuda": "Ayuda"
+        "ayuda": "Ayuda",
+        "importar": "Importar",
+        "salir": "Salir",
+        "generar_consultas": "Generar consultas",
+        "asistente_consultas": "Asistente de consultas",
+        "acerca": "Acerca de",
+        "lenguaje": "Lenguaje",
+        "español": "Español",
+        "ingles": "Ingles",
+        "bd_existente": "Base de datos existente",
+        "nueva_bd": "Nueva base de datos"
     },
     "en": {
         "seleccionar_archivo_bd": "Select SQLite file",
@@ -37,7 +47,18 @@
         "seleccionar_db": "Select database",
         "archivo": "File",
         "consulta": "Queries",
-        "ayuda": "Help"
+        "ayuda": "Help",
+        "importar": "Import",
+        "salir": "Exit",
+        "generar_consultas": "Generate queries",
+        "asistente_consultas": "Query Assistant",
+        "acerca": "About",
+        "lenguaje": "Language",
+        "español": "Spanish",
+        "ingles": "English",
+        "bd_existente": "Existing database",
+        "nueva_bd": "New database"
+
 
     }
 }
