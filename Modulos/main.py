@@ -183,7 +183,7 @@ barra_menu.add_cascade(label=variable.idioma_actual["consulta"], menu=menu_consu
 
 # Crear un menú "Ayuda"
 menu_ayuda = tk.Menu(barra_menu, tearoff=0)
-menu_ayuda.add_command(label=variable.idioma_actual["acerca"], command=acerca_de)
+
 
 # Añadir el menú "Ayuda" a la barra de menú
 barra_menu.add_cascade(label=variable.idioma_actual["ayuda"], menu=menu_ayuda)
@@ -195,6 +195,8 @@ menu_languaje.add_command(label=variable.idioma_actual["ingles"], command=lambda
 
 # Agregar el submenú "Lenguaje" al menú "es -en"
 menu_ayuda.add_cascade(label=variable.idioma_actual["lenguaje"], menu=menu_languaje)
+
+menu_ayuda.add_command(label=variable.idioma_actual["acerca"], command=acerca_de)
 
 # Configurar la ventana para que use la barra de menú
 root.config(menu=barra_menu)
