@@ -45,7 +45,6 @@ def acerca_de():
     messagebox.showinfo("Acerca de", "V1 OpenDataLite")
 
 # Crear la ventana principal
-
 def ejecutar_sql():
     # Obtiene la consulta SQL del campo de texto
     sentencia_sql = caja_texto.get("1.0", END).strip()
