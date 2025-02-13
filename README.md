@@ -10,3 +10,10 @@ En este proyecto, se desarrollará una aplicación de escritorio de código abie
  # Instalar matplotlib
 
  pip install matplotlib
+
+ pip install reportlab
+ pip install pandas reportlab
+ pip install plotly
+ pip install PyQt5
+
+ pip install tk
