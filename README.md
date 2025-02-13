@@ -14,7 +14,7 @@ En este proyecto, se desarrollará una aplicación de escritorio de código abie
  # Otras que se pueden utilizar
  pip install reportlab
  
- # reportlab
+
  pip install pandas reportlab
  
  pip install plotly
