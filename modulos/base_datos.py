@@ -1,6 +1,6 @@
 import sqlite3
 import pandas as pd
-from tkinter import filedialog, messagebox 
+from tkinter import filedialog, messagebox
 
 def conectar_bd(nombre_bd):
     """Conecta a una base de datos SQLite."""
@@ -21,6 +21,15 @@ def seleccionar_bd():
         return None
     
 
+def ejecutar_consulta(sentencia_sql, nombre_bd):
+    """Ejecuta una consulta SQL en la base de datos."""
+    conexion = conectar_bd(nombre_bd)
+    cursor = conexion.cursor()
+    cursor.execute(sentencia_sql)
+    resultado = cursor.fetchall()
+    conexion.close()
+    return resultado
+
 def cargar_csv_a_bd(ruta_csv, nombre_bd, nombre_tabla):
     try:
         # Intenta cargar el archivo CSV con un encoding específico
@@ -31,6 +40,7 @@ def cargar_csv_a_bd(ruta_csv, nombre_bd, nombre_tabla):
         # ...
     except Exception as e:
         print(f"Error al cargar el CSV: {e}")
+
 
 def obtener_columnas(nombre_bd, nombre_tabla):
     try:
@@ -50,30 +60,4 @@ def obtener_tablas_bd(nombre_bd):
         cursor = conn.cursor()
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
         tablas = cursor.fetchall()
-    return [tabla[0] for tabla in tablas]
-
-def ejecutar_consulta(nombre_bd, consulta):
-    try:
-        with sqlite3.connect(nombre_bd) as conn:
-            cursor = conn.cursor()
-            cursor.execute(consulta)
-            columnas = [desc[0] for desc in cursor.description] if cursor.description else []
-            filas = cursor.fetchall()
-            return columnas, filas
-    except sqlite3.Error as e:
-        raise RuntimeError(f"Error en la consulta SQL: {e}")
-
-def cargar_tablas(nombre_bd):
-    with sqlite3.connect(nombre_bd) as conn:
-        cursor = conn.cursor()
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-        return [row[0] for row in cursor.fetchall()]
-
-def importar_csv_a_db(ruta_csv, nombre_bd, nombre_tabla):
-    try:
-        df = pd.read_csv(ruta_csv)
-        with sqlite3.connect(nombre_bd) as conn:
-            df.to_sql(nombre_tabla, conn, if_exists='replace', index=False)
-        return f"Datos importados correctamente a la tabla '{nombre_tabla}'."
-    except Exception as e:
-        return f"Error al importar datos: {e}"
+    return [tabla[0] for tabla in tablas] 

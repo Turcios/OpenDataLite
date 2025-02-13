@@ -1,197 +1,127 @@
 import tkinter as tk
 from tkinter import messagebox, filedialog, ttk
 import pandas as pd
-import sqlite3
-import variable
+import sqlite3 
 
-# Variables globales 
-db_context = {"nombre_bd": None, "nombre_tabla": None, "ruta_bd":None, "ruta_csv":None}
+# Contexto para almacenar rutas y configuraciones actuales
+db_context = {"nombre_bd": None, "nombre_tabla": None, "ruta_bd": None, "ruta_csv": None}
 
-# Función para seleccionar un archivo SQLite y cargar las tablas en un combobox
-def seleccionar_archivo_bd(tipo):
-    if tipo==1:
-        ruta_bd = filedialog.askopenfilename(title=variable.idioma_actual["seleccionar_archivo_bd"], filetypes=[("Archivos SQLite", "*.db")])
-        if ruta_bd:
-            db_context["ruta_db"] =ruta_bd
+# Selección de archivos con un cuadro de diálogo
+def seleccionar_archivo(tipo_archivo):
+    tipos = {1: ("Archivos SQLite", "*.db"), 2: ("CSV files", "*.csv")}
+    ruta_archivo = filedialog.askopenfilename(title=f"Seleccionar {tipos[tipo_archivo][0]}", filetypes=[tipos[tipo_archivo]])
+    if ruta_archivo:
+        if tipo_archivo == 1:
+            db_context["ruta_bd"] = ruta_archivo
         else:
-            db_context["ruta_db"] =variable.idioma_actual["no_seleccion_archivo"]
+            db_context["ruta_csv"] = ruta_archivo
     else:
-        ruta_bd = filedialog.askopenfilename(title=variable.idioma_actual["seleccionar_csv"], filetypes=[("CSV files", "*.csv")])
-        if ruta_bd:
-            db_context["ruta_csv"] =ruta_bd
-        else:
-            db_context["ruta_csv"] =variable.idioma_actual["no_seleccion_archivo"]
+        messagebox.showwarning("Advertencia", f"No se seleccionó ningún {tipos[tipo_archivo][0].lower()}.")
 
-# Función para abrir una nueva ventana después de cargar el archivo, base de datos nueva
+# Crear una nueva base de datos e importar CSV
 def abrir_nueva_ventana(frame_izquierdo):
     nueva_ventana = tk.Toplevel()
     nueva_ventana.title("OpenDataLite")
+    nueva_ventana.geometry("600x400+300+200")
 
-     # Definir el tamaño de la nueva ventana
-    ancho_ventana = 600
-    alto_ventana = 400
-    x_ventana = int((850 / 2) - (ancho_ventana / 2))
-    y_ventana = int((400 / 2) - (alto_ventana / 2))
+    # Componentes de entrada
+    entradas = {
+        "Nombre de la base de datos": tk.Entry(nueva_ventana),
+        "Nombre de la tabla": tk.Entry(nueva_ventana)
+    }
+    for label_text, entry in entradas.items():
+        tk.Label(nueva_ventana, text=label_text).pack(pady=5)
+        entry.pack(pady=5)
 
-     # Establecer la geometría de la ventana nueva
-    nueva_ventana.geometry(f"{ancho_ventana}x{alto_ventana}+{x_ventana}+{y_ventana}")
+    # Botón para seleccionar archivo CSV
+    tk.Button(nueva_ventana, text="Seleccionar CSV", command=lambda: seleccionar_archivo(2)).pack(pady=5)
 
-     # Etiqueta de campo del nombre de la base de datos
-    label_nombre_bd = tk.Label(nueva_ventana, text=variable.idioma_actual["nombre_base_datos"])
-    label_nombre_bd.pack(pady=5)
-   
-    # Entrada de texto para el nombre
-    entry_nombre_bd = tk.Entry(nueva_ventana)
-    entry_nombre_bd.pack(pady=5)
+    # Botón para confirmar y crear la base de datos
+    tk.Button(
+        nueva_ventana, text="Enviar",
+        command=lambda: mostrar_datos(entradas["Nombre de la base de datos"].get(), entradas["Nombre de la tabla"].get(), frame_izquierdo, nueva_ventana)
+    ).pack(pady=10)
 
-    # Etiqueta de campo del nombre de la tabla
-    label_nombre_tabla = tk.Label(nueva_ventana, text=variable.idioma_actual["nombre_tabla"])
-    label_nombre_tabla.pack(pady=5)
-
-    # Entrada de texto para el nombre
-    entry_nombre_tabla = tk.Entry(nueva_ventana)
-    entry_nombre_tabla.pack(pady=5)  
-
-    # Etiqueta para seleccionar el archivo de CSV
-    label_nombre_bd = tk.Label(nueva_ventana, text=variable.idioma_actual["base_archivo_csv"]+":") 
-    label_nombre_bd.pack(pady=5)
-    boton_seleccionar_bd = tk.Button(nueva_ventana, text=variable.idioma_actual["seleccionar_csv"], command=lambda: seleccionar_archivo_bd(2))
-    boton_seleccionar_bd.pack(pady=5)  
-
-    boton_enviar = tk.Button(
-        nueva_ventana, 
-        text=variable.idioma_actual["enviar"], 
-        command=lambda: mostrar_datos(entry_nombre_bd.get(), entry_nombre_tabla.get(), frame_izquierdo, nueva_ventana)
-    )
-    boton_enviar.pack(pady=10)
-
-# Función para mostrar los datos ingresados en el formulario
+# Cargar y mostrar datos desde el CSV a la base de datos nueva
 def mostrar_datos(nombre_bd, nombre_tabla, frame_izquierdo, nueva_ventana):
-    if db_context["ruta_csv"]:
-        try:
-            df = pd.read_csv(db_context["ruta_csv"], on_bad_lines='skip')  # Permite saltar líneas problemáticas
+    if not db_context.get("ruta_csv"):
+        messagebox.showerror("Error", "No se ha seleccionado un archivo CSV.")
+        return
 
-            conexion = sqlite3.connect(nombre_bd + ".db")
-            df.to_sql(nombre_tabla, conexion, if_exists='replace', index=False)
-            conexion.close()
+    try:
+        df = pd.read_csv(db_context["ruta_csv"], on_bad_lines='skip')
+        conexion = sqlite3.connect(nombre_bd + ".db")
+        df.to_sql(nombre_tabla, conexion, if_exists='replace', index=False)
+        conexion.close()
+        messagebox.showinfo("Éxito", "CSV cargado exitosamente.")
+        mostrar_estructura(nombre_bd + ".db", frame_izquierdo)
+        db_context.update({"nombre_bd": nombre_bd + ".db", "nombre_tabla": nombre_tabla})
+    except Exception as e:
+        messagebox.showerror("Error", f"Error al cargar CSV: {e}")
+    finally:
+        nueva_ventana.destroy()
 
-            messagebox.showinfo(variable.idioma_actual["exito"], variable.idioma_actual["mensaje_exito_csv"])
-            mostrar_estructura(nombre_bd + ".db", frame_izquierdo)
+# Cargar CSV en una base de datos existente
+def cargar_csv_bd(frame_izquierdo, nombre_tabla, ventana_carga):
+    try:
+        conexion = sqlite3.connect(db_context["ruta_bd"])
+        df = pd.read_csv(db_context["ruta_csv"], on_bad_lines='skip')
+        df.to_sql(nombre_tabla, conexion, if_exists='replace', index=False)
+        conexion.close()
+        mostrar_estructura(db_context["ruta_bd"], frame_izquierdo)
+        messagebox.showinfo("Éxito", "Datos agregados a la base de datos.")
+    except Exception as e:
+        messagebox.showerror("Error", f"Error al cargar CSV en la base de datos: {e}")
+    finally:
+        ventana_carga.destroy()
 
-            # Guardar el contexto actual de la base de datos y la tabla
-            db_context["nombre_bd"] = nombre_bd + ".db"
-            db_context["nombre_tabla"] = nombre_tabla
-
-        except pd.errors.ParserError as e:
-            messagebox.showerror("Error", f"{variable.idioma_actual["mensaje_error_carga_linea"]}.\n{e}")
-        except Exception as e:
-            messagebox.showerror("Error", f"{variable.idioma_actual["mensaje_error_carga"]}: {e}")
-
-    nueva_ventana.destroy()
-
-# Obtener el contexto actual para poder hacer las consultas con la bd que se cargo
-def obtener_contexto():
-    return db_context
-
-#Carga una base de datos existente
-def cargar_csv_bd(frame_izquierdo, nombre_tabla,ventana_carga):
-    conexion = sqlite3.connect(db_context["ruta_db"])
-    print("Conexión exitosa a la base de datos")
-    
-    # Cargar el archivo CSV en un DataFrame de pandas
-    df = pd.read_csv(db_context["ruta_csv"], on_bad_lines='skip')
-    df.to_sql(nombre_tabla, conexion, if_exists='replace', index=False)
-    print("Datos agregados a la tabla en la base de datos")
-    conexion.close()
-    mostrar_estructura(db_context["ruta_db"], frame_izquierdo)
-    ventana_carga.destroy()
-
-#Carga una base de datos existente
+# Ventana para cargar una base de datos existente
 def cargar_base(frame_izquierdo):
     ventana_carga = tk.Toplevel()
     ventana_carga.title("OpenDataLite")
+    ventana_carga.geometry("600x400+300+200")
 
-     # Definir el tamaño de la nueva ventana
-    ancho_ventana = 600
-    alto_ventana = 400
-    x_ventana = int((850 / 2) - (ancho_ventana / 2))
-    y_ventana = int((400 / 2) - (alto_ventana / 2))
+    # Componentes para seleccionar archivos y tabla
+    tk.Button(ventana_carga, text="Seleccionar DB", command=lambda: seleccionar_archivo(1)).pack(pady=5)
+    tk.Button(ventana_carga, text="Seleccionar CSV", command=lambda: seleccionar_archivo(2)).pack(pady=5)
 
-     # Establecer la geometría de la ventana nueva
-    ventana_carga.geometry(f"{ancho_ventana}x{alto_ventana}+{x_ventana}+{y_ventana}")
-
-     # Etiqueta para seleccionar el archivo de la base de datos
-    label_nombre_bd = tk.Label(ventana_carga, text=variable.idioma_actual["base_datos"] )
-    label_nombre_bd.pack(pady=5)
-    boton_seleccionar_bd = tk.Button(ventana_carga, text=variable.idioma_actual["seleccionar_db"], command=lambda: seleccionar_archivo_bd(1))
-    boton_seleccionar_bd.pack(pady=5)  
-
-  # Etiqueta para seleccionar el archivo de la base de datos
-    label_nombre_bd = tk.Label(ventana_carga, text=variable.idioma_actual["seleccionar_db"])
-    label_nombre_bd.pack(pady=5)
-    boton_seleccionar_bd = tk.Button(ventana_carga, text=variable.idioma_actual["seleccionar_csv"], command=lambda: seleccionar_archivo_bd(2))
-    boton_seleccionar_bd.pack(pady=5)  
-
-    # Etiqueta de campo del nombre de la tabla
-    label_nombre_tabla = tk.Label(ventana_carga, text=variable.idioma_actual["nombre_tabla"])
+    label_nombre_tabla = tk.Label(ventana_carga, text="Nombre de la tabla")
     label_nombre_tabla.pack(pady=5)
-
-    # Entrada de texto para el nombre
     entry_nombre_tabla = tk.Entry(ventana_carga)
-    entry_nombre_tabla.pack(pady=5)    
- # Conectar a la base de datos
-   
-    boton_enviar = tk.Button(
-        ventana_carga, 
-        text=variable.idioma_actual["enviar"], 
-        command=lambda:cargar_csv_bd(frame_izquierdo,entry_nombre_tabla.get(),ventana_carga)
-    )
-    boton_enviar.pack(pady=10)
-   
-def nueva_archivo(frame_izquierdo, tipo):
-    print(tipo)
-    if tipo == 1:
-        cargar_base(frame_izquierdo)
-    else:
-       abrir_nueva_ventana(frame_izquierdo)
+    entry_nombre_tabla.pack(pady=5)
 
- # Función para mostrar la estructura de la base de datos en una nueva ventana
+    tk.Button(
+        ventana_carga, text="Enviar",
+        command=lambda: cargar_csv_bd(frame_izquierdo, entry_nombre_tabla.get(), ventana_carga)
+    ).pack(pady=10)
+
+# Mostrar estructura de la base de datos en un Treeview
 def mostrar_estructura(nombre_bd, frame_izquierdo):
-    # Limpiar el frame izquierdo antes de cargar la nueva estructura
     for widget in frame_izquierdo.winfo_children():
         widget.destroy()
 
- # Crear una etiqueta de título en el frame izquierdo
-    label_estructura = tk.Label(frame_izquierdo, text=f"{variable.idioma_actual['estructura']}: {nombre_bd}" )
-    label_estructura.pack(pady=5)
+    tk.Label(frame_izquierdo, text=f"Estructura: {nombre_bd}").pack(pady=5)
 
-# Crear un Treeview para mostrar la estructura de la base de datos
     treeview = ttk.Treeview(frame_izquierdo)
     treeview.pack(expand=True, fill="both", padx=10, pady=10)
-
-    # Crear la columna principal del Treeview
     treeview.heading("#0", text="Tablas", anchor="w")
 
- # Conectar a la base de datos y obtener la información de las tablas
-    conexion = sqlite3.connect(nombre_bd)
-    cursor = conexion.cursor()
+    try:
+        conexion = sqlite3.connect(nombre_bd)
+        cursor = conexion.cursor()
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+        for tabla in cursor.fetchall():
+            nombre_tabla = tabla[0]
+            nodo_tabla = treeview.insert("", "end", text=nombre_tabla, open=False)
+            cursor.execute(f"PRAGMA table_info('{nombre_tabla}');")
+            for columna in cursor.fetchall():
+                treeview.insert(nodo_tabla, "end", text=columna[1], open=False)
+    finally:
+        conexion.close()
 
-    # Obtener la lista de tabla
-    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-    tablas = cursor.fetchall()
-    
-     # Recorrer las tablas y obtener sus columnas
-    for tabla in tablas:
-        nombre_tabla = tabla[0]
-        nodo_tabla = treeview.insert("", "end", text=nombre_tabla, open=False)
-
-        # Obtener las columnas de cada tabla
-        cursor.execute(f"PRAGMA table_info({nombre_tabla});")
-        columnas = cursor.fetchall()
-
-        # Insertar las columnas como nodos hijos
-        for columna in columnas:
-            treeview.insert(nodo_tabla, "end", text=columna[1], open=False)
-
-        # Cerrar la conexión
-    conexion.close()
+# Función principal para determinar tipo de operación
+def nueva_archivo(frame_izquierdo, tipo):
+    if tipo == 1:
+        cargar_base(frame_izquierdo)
+    else:
+        abrir_nueva_ventana(frame_izquierdo)
