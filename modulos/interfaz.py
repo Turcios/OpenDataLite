@@ -4,8 +4,9 @@ from tkinter import Menu, messagebox, filedialog, Frame, Label, Listbox, Text, E
 from modulos.base_datos import obtener_tablas_bd, ejecutar_consulta, conectar_bd
 from modulos.idioma import obtener_texto, cambiar_idioma
 from modulos.asistente import abrir_wizard, exportar_pdf
-import sqlite3
+import modulos.file as file
 import os
+import modulos.variable as var
 
 def iniciar_interface():
     # Inicia la interfaz principal de la aplicación
@@ -60,9 +61,9 @@ class InterfazApp:
 
         # Menú Archivo
         menu_archivo = Menu(barra_menu, tearoff=0)
-        menu_archivo.add_command(label=obtener_texto('menu_import_db'), command=self.cargar_base_datos)
+        menu_archivo.add_command(label=obtener_texto('menu_import_db'), command=lambda: file.nueva_archivo(self.left_panel, 1))
         menu_archivo.add_separator()  # Separador visual entre opciones
-        menu_archivo.add_command(label=obtener_texto('New Date Base'), command=self.crear_nueva_base_datos)
+        menu_archivo.add_command(label=obtener_texto('New Date Base'), command=lambda: file.nueva_archivo(self.left_panel, 2))
         menu_archivo.add_separator()
         menu_archivo.add_command(label=obtener_texto('menu_exit'), command=self.root.quit)
         barra_menu.add_cascade(label=obtener_texto('menu_file'), menu=menu_archivo)
@@ -90,79 +91,6 @@ class InterfazApp:
         # Configurar el menú en la ventana principal
         self.root.config(menu=barra_menu)
 
-    def cargar_base_datos(self):
-        ruta_bd = filedialog.askopenfilename(title="Seleccionar base de datos", filetypes=[("Archivos SQLite", "*.db")])
-        if ruta_bd:
-            try:
-                self.conn = conectar_bd(ruta_bd)
-                self.base_datos_actual = ruta_bd
-                messagebox.showinfo("Éxito", "Base de datos cargada correctamente")
-                self.mostrar_tablas()
-            except Exception as e:
-                messagebox.showerror("Error", f"No se pudo cargar la base de datos: {str(e)}")
-
-    def crear_nueva_base_datos(self):
-        # Crear una ventana emergente para crear una nueva base de datos
-        self.ventana_nueva_bd = tk.Toplevel(self.root)
-        self.ventana_nueva_bd.title('Nueva Base de Datos')
-        self.ventana_nueva_bd.geometry('500x400')
-
-        # Campo para el nombre de la base de datos
-        tk.Label(self.ventana_nueva_bd, text='Nombre base de datos').pack(pady=5)
-        self.nombre_bd_entry = tk.Entry(self.ventana_nueva_bd)
-        self.nombre_bd_entry.pack(pady=5)
-
-        # Campo para el nombre de la tabla
-        tk.Label(self.ventana_nueva_bd, text='Nombre de la tabla').pack(pady=5)
-        self.nombre_tabla_entry = tk.Entry(self.ventana_nueva_bd)
-        self.nombre_tabla_entry.pack(pady=5)
-
-        # Botón para seleccionar el archivo CSV
-        tk.Label(self.ventana_nueva_bd, text='Base de archivo CSV:').pack(pady=5)
-        self.archivo_csv_btn = tk.Button(self.ventana_nueva_bd, text='Seleccionar archivo CSV', command=self.seleccionar_archivo_csv)
-        self.archivo_csv_btn.pack(pady=5)
-
-        # Botón para enviar
-        self.enviar_btn = tk.Button(self.ventana_nueva_bd, text='Enviar', command=self.cargar_nueva_base_datos)
-        self.enviar_btn.pack(pady=10)
-
-    def seleccionar_archivo_csv(self):
-        # Mantener la ventana emergente al frente
-        self.ventana_nueva_bd.attributes('-topmost', True)
-        self.ruta_csv = filedialog.askopenfilename(filetypes=[('Archivos CSV', '*.csv')])
-        # self.ventana_nueva_bd.attributes('-topmost', False)  # Opcional: restablecer la propiedad
-        if self.ruta_csv:
-            messagebox.showinfo('Archivo Seleccionado', f'Se seleccionó: {self.ruta_csv}')
-
-    def cargar_nueva_base_datos(self):
-        nombre_bd = self.nombre_bd_entry.get()
-        nombre_tabla = self.nombre_tabla_entry.get()
-
-        if not nombre_bd or not nombre_tabla or not hasattr(self, 'ruta_csv'):
-            messagebox.showerror('Error', 'Todos los campos son obligatorios')
-            return
-        # Crear la base de datos y cargar el CSV
-        try:
-            conexion = sqlite3.connect(f'{nombre_bd}.db')
-            cursor = conexion.cursor()
-            # Crear la tabla
-            cursor.execute(f'CREATE TABLE {nombre_tabla} (id INTEGER PRIMARY KEY AUTOINCREMENT, datos TEXT)')
-            # Leer y cargar datos del CSV
-            with open(self.ruta_csv, 'r') as archivo:
-                for linea in archivo:
-                    cursor.execute(f'INSERT INTO {nombre_tabla} (datos) VALUES (?)', (linea.strip(),))
-            conexion.commit()
-            messagebox.showinfo('Éxito', 'Base de datos creada y datos cargados correctamente')
-            
-            # Actualizar la base de datos actual
-            self.base_datos_actual = f'{nombre_bd}.db'
-            self.mostrar_tablas()  # Actualizar el panel de tablas
-            self.ventana_nueva_bd.destroy()  # Cerrar la ventana emergente
-        except Exception as e:
-            messagebox.showerror('Error', f'Ocurrió un error: {e}')
-        finally:
-            conexion.close()
-
     def actualizar_panel_tablas(self):
         # Limpiar el panel de tablas y mostrar las bases de datos locales (.db)
         self.table_listbox.delete(0, tk.END)
@@ -184,7 +112,7 @@ class InterfazApp:
             self.table_listbox.insert(END, tabla)
 
     def ejecutar_consulta(self):
-        if not self.base_datos_actual:
+        if not var.nombre_bd:
             messagebox.showerror("Error", "No hay una base de datos cargada")
             return
 

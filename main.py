@@ -1,3 +1,4 @@
+import modulos.interfaz
 
 from modulos.interfaz import iniciar_interface
 

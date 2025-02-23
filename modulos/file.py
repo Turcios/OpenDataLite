@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import messagebox, filedialog, ttk
 import pandas as pd
 import sqlite3 
+import modulos.variable as var
 
 # Contexto para almacenar rutas y configuraciones actuales
 db_context = {"nombre_bd": None, "nombre_tabla": None, "ruta_bd": None, "ruta_csv": None}
@@ -23,6 +24,9 @@ def abrir_nueva_ventana(frame_izquierdo):
     nueva_ventana = tk.Toplevel()
     nueva_ventana.title("OpenDataLite")
     nueva_ventana.geometry("600x400+300+200")
+
+    nueva_ventana.transient(nueva_ventana.master)  # Hace que la ventana dependa de la principal
+    nueva_ventana.grab_set()  # Bloquea la interacción con la ventana principal
 
     # Componentes de entrada
     entradas = {
@@ -81,6 +85,9 @@ def cargar_base(frame_izquierdo):
     ventana_carga.title("OpenDataLite")
     ventana_carga.geometry("600x400+300+200")
 
+    ventana_carga.transient(ventana_carga.master)  # Hace que la ventana dependa de la principal
+    ventana_carga.grab_set()   # Bloquea la interacción con la ventana principal
+
     # Componentes para seleccionar archivos y tabla
     tk.Button(ventana_carga, text="Seleccionar DB", command=lambda: seleccionar_archivo(1)).pack(pady=5)
     tk.Button(ventana_carga, text="Seleccionar CSV", command=lambda: seleccionar_archivo(2)).pack(pady=5)
@@ -107,6 +114,7 @@ def mostrar_estructura(nombre_bd, frame_izquierdo):
     treeview.heading("#0", text="Tablas", anchor="w")
 
     try:
+        var.nombre_bd =  f'{nombre_bd}'
         conexion = sqlite3.connect(nombre_bd)
         cursor = conexion.cursor()
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
