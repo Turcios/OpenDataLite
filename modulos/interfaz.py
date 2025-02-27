@@ -1,6 +1,6 @@
 
 import tkinter as tk
-from tkinter import Menu, messagebox, filedialog, Frame, Label, Listbox, Text, END
+from tkinter import Menu, messagebox, Frame, Label, Listbox, Text, END
 from modulos.base_datos import obtener_tablas_bd, ejecutar_consulta, conectar_bd
 from modulos.idioma import obtener_texto, cambiar_idioma
 from modulos.asistente import abrir_wizard, exportar_pdf
@@ -43,10 +43,6 @@ class InterfazApp:
         self.right_panel = Frame(self.main_frame)
         self.right_panel.pack(side='right', fill='both', expand=True)
 
-        # Botón para exportar gráfico a PDF
-        self.exportar_pdf_btn = tk.Button(self.right_panel, text="Exportar Gráfico a PDF", command=exportar_pdf)
-        self.exportar_pdf_btn.pack()
-
         Label(self.right_panel, text="Consulta SQL").pack()
         self.query_entry = Text(self.right_panel, height=5)
         self.query_entry.pack(fill='x')
@@ -72,6 +68,8 @@ class InterfazApp:
         menu_consultas = Menu(barra_menu, tearoff=0)
         menu_consultas.add_command(label=obtener_texto('menu_generate_queries'), command=self.ejecutar_consulta)
         menu_consultas.add_command(label=obtener_texto('menu_query_assistant'), command=self.mostrar_asistente)
+        # Botón para exportar gráfico a PDF
+        menu_consultas.add_command(label="Exportar Gráfico a PDF", command=exportar_pdf)
         barra_menu.add_cascade(label=obtener_texto('menu_queries'), menu=menu_consultas)
 
         # Menú Ayuda
