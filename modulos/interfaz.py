@@ -1,12 +1,12 @@
 
 import tkinter as tk
 from tkinter import Menu, messagebox, filedialog, Frame, Label, Listbox, Text, END
-from modulos.base_datos import obtener_tablas_bd, ejecutar_consulta, conectar_bd
+from modulos.base_datos import obtener_tablas_bd, validar_bd, conectar_bd
 from modulos.idioma import obtener_texto, cambiar_idioma
 from modulos.asistente import abrir_wizard, exportar_pdf
 import modulos.file as file
 import os
-import modulos.variable as var
+
 
 def iniciar_interface():
     # Inicia la interfaz principal de la aplicación
@@ -22,7 +22,6 @@ class InterfazApp:
     def __init__(self, root):
         self.root = root
         self.conn = None
-        self.base_datos_actual = None
 
         # Crear el menú principal
         self.crear_menu()
@@ -70,7 +69,7 @@ class InterfazApp:
 
         # Menú Consultas
         menu_consultas = Menu(barra_menu, tearoff=0)
-        menu_consultas.add_command(label=obtener_texto('menu_generate_queries'), command=self.ejecutar_consulta)
+        menu_consultas.add_command(label=obtener_texto('menu_generate_queries'), command=lambda: validar_bd(self))
         menu_consultas.add_command(label=obtener_texto('menu_query_assistant'), command=self.mostrar_asistente)
         barra_menu.add_cascade(label=obtener_texto('menu_queries'), menu=menu_consultas)
 
@@ -100,34 +99,6 @@ class InterfazApp:
         else:
             for archivo in bases_de_datos:
                 self.table_listbox.insert(tk.END, archivo)
-
-    def mostrar_tablas(self):
-        if not self.base_datos_actual:
-            messagebox.showerror("Error", "No hay una base de datos cargada")
-            return
-
-        self.table_listbox.delete(0, END)
-        tablas = obtener_tablas_bd(self.base_datos_actual)
-        for tabla in tablas:
-            self.table_listbox.insert(END, tabla)
-
-    def ejecutar_consulta(self):
-        if not var.nombre_bd:
-            messagebox.showerror("Error", "No hay una base de datos cargada")
-            return
-
-        query = self.query_entry.get("1.0", END).strip()
-        if not query:
-            messagebox.showwarning("Advertencia", "La consulta SQL está vacía")
-            return 
-
-        try:
-            resultados = ejecutar_consulta(query, self.base_datos_actual)
-            self.result_text.delete("1.0", END)
-            for fila in resultados:
-                self.result_text.insert(END, f"{fila}\n")
-        except Exception as e:
-            messagebox.showerror("Error", f"Error al ejecutar la consulta: {str(e)}")
 
     def mostrar_asistente(self):
         # Mostrar el asistente en el panel derecho

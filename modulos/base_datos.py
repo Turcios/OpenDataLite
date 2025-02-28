@@ -1,6 +1,7 @@
 import sqlite3
 import pandas as pd
-from tkinter import filedialog, messagebox
+from tkinter import END, filedialog, messagebox
+import modulos.variable as var
 
 def conectar_bd(nombre_bd):
     """Conecta a una base de datos SQLite."""
@@ -20,6 +21,24 @@ def seleccionar_bd():
         messagebox.showwarning("Advertencia", "No se seleccionó ninguna base de datos.")
         return None
     
+def validar_bd(self):
+    if not var.nombre_bd:
+        messagebox.showerror("Error", "No hay una base de datos cargada")
+        return
+
+    query = self.query_entry.get("1.0", END).strip()
+    if not query:
+        messagebox.showwarning("Advertencia", "La consulta SQL está vacía")
+        return 
+
+    try:
+        resultados = ejecutar_consulta(query, var.nombre_bd)
+        self.result_text.delete("1.0", END)
+        for fila in resultados:
+            self.result_text.insert(END, f"{fila}\n")
+    except Exception as e:
+        messagebox.showerror("Error", f"Error al ejecutar la consulta: {str(e)}")
+
 
 def ejecutar_consulta(sentencia_sql, nombre_bd):
     """Ejecuta una consulta SQL en la base de datos."""
