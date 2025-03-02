@@ -42,8 +42,8 @@ class InterfazApp:
         self.right_panel.pack(side='right', fill='both', expand=True)
 
         # Botón para exportar gráfico a PDF
-        #self.exportar_pdf_btn = tk.Button(self.right_panel, text="Exportar Gráfico a PDF", command=exportar_pdf)
-        #self.exportar_pdf_btn.pack()
+        self.exportar_pdf_btn = tk.Button(self.right_panel, text="Exportar Gráfico a PDF", command=exportar_pdf)
+        self.exportar_pdf_btn.pack()
 
         Label(self.right_panel, text="Consulta SQL").pack()
         self.query_entry = Text(self.right_panel, height=5)
@@ -83,6 +83,8 @@ class InterfazApp:
         menu_consultas = Menu(barra_menu, tearoff=0)
         menu_consultas.add_command(label=obtener_texto('menu_generate_queries'), command=lambda: validar_bd(self))
         menu_consultas.add_command(label=obtener_texto('menu_query_assistant'), command=self.mostrar_asistente)
+        # Botón para exportar gráfico a PDF
+        menu_consultas.add_command(label="Exportar Gráfico a PDF", command=exportar_pdf)
         barra_menu.add_cascade(label=obtener_texto('menu_queries'), menu=menu_consultas)
 
         # Menú Ayuda

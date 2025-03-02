@@ -1,5 +1,3 @@
-import modulos.interfaz
-
 from modulos.interfaz import iniciar_interface
 
 if __name__ == "__main__":
