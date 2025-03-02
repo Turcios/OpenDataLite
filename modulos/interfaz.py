@@ -1,12 +1,11 @@
 
 import tkinter as tk
-from tkinter import Menu, messagebox, filedialog, Frame, Label, Listbox, Text, END
-from modulos.base_datos import obtener_tablas_bd, validar_bd, conectar_bd
+from tkinter import Menu, messagebox, Frame, Label, Listbox, Text, END,ttk
+from modulos.base_datos import validar_bd
 from modulos.idioma import obtener_texto, cambiar_idioma
 from modulos.asistente import abrir_wizard, exportar_pdf
 import modulos.file as file
 import os
-
 
 def iniciar_interface():
     # Inicia la interfaz principal de la aplicación
@@ -43,8 +42,8 @@ class InterfazApp:
         self.right_panel.pack(side='right', fill='both', expand=True)
 
         # Botón para exportar gráfico a PDF
-        self.exportar_pdf_btn = tk.Button(self.right_panel, text="Exportar Gráfico a PDF", command=exportar_pdf)
-        self.exportar_pdf_btn.pack()
+        #self.exportar_pdf_btn = tk.Button(self.right_panel, text="Exportar Gráfico a PDF", command=exportar_pdf)
+        #self.exportar_pdf_btn.pack()
 
         Label(self.right_panel, text="Consulta SQL").pack()
         self.query_entry = Text(self.right_panel, height=5)
@@ -53,6 +52,19 @@ class InterfazApp:
         # Resultado de consultas
         self.result_text = Text(self.right_panel)
         self.result_text.pack(fill='both', expand=True)
+
+        # Frame para el Treeview y la scrollbar
+        self.frame_treeview = Frame(self.right_panel)
+        self.frame_treeview.pack(expand=True, fill='both', padx=100, pady=10)
+
+        # Crear Treeview para mostrar los resultados de la consulta SQL
+        self.treeview = ttk.Treeview(self.frame_treeview)
+        self.treeview.pack(side="left", expand=True, fill='both')
+
+        # Agregar una barra de desplazamiento vertical
+        self.scrollbar = ttk.Scrollbar(self.frame_treeview, orient="vertical", command=self.treeview.yview)
+        self.treeview.configure(yscroll=self.scrollbar.set)
+        self.scrollbar.pack(side="right", fill="y")
 
     def crear_menu(self):
         # Crea el menú principal de la aplicación con sus submenús
