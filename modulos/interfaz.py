@@ -1,6 +1,6 @@
 
 import tkinter as tk
-from tkinter import Menu, messagebox, Frame, Label, Listbox, Text, END,ttk
+from tkinter import Menu, messagebox, Frame, Label, Listbox, Text, END
 from modulos.base_datos import validar_bd
 from modulos.idioma import obtener_texto, cambiar_idioma
 from modulos.asistente import abrir_wizard, exportar_pdf
@@ -48,19 +48,20 @@ class InterfazApp:
         # Resultado de consultas
         self.result_text = Text(self.right_panel)
         self.result_text.pack(fill='both', expand=True)
+        
 
         # Frame para el Treeview y la scrollbar
-        self.frame_treeview = Frame(self.right_panel)
-        self.frame_treeview.pack(expand=True, fill='both', padx=100, pady=10)
+        #self.frame_treeview = Frame(self.right_panel)
+        #self.frame_treeview.pack(expand=True, fill='both', padx=100, pady=10)
 
         # Crear Treeview para mostrar los resultados de la consulta SQL
-        self.treeview = ttk.Treeview(self.frame_treeview)
-        self.treeview.pack(side="left", expand=True, fill='both')
+        #self.treeview = ttk.Treeview(self.frame_treeview)
+        #self.treeview.pack(side="left", expand=True, fill='both')
 
         # Agregar una barra de desplazamiento vertical
-        self.scrollbar = ttk.Scrollbar(self.frame_treeview, orient="vertical", command=self.treeview.yview)
-        self.treeview.configure(yscroll=self.scrollbar.set)
-        self.scrollbar.pack(side="right", fill="y")
+        #self.scrollbar = ttk.Scrollbar(self.frame_treeview, orient="vertical", command=self.treeview.yview)
+        #self.treeview.configure(yscroll=self.scrollbar.set)
+        #self.scrollbar.pack(side="right", fill="y")
 
     def crear_menu(self):
         # Crea el menú principal de la aplicación con sus submenús
