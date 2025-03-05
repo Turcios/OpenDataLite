@@ -41,10 +41,6 @@ class InterfazApp:
         self.right_panel = Frame(self.main_frame)
         self.right_panel.pack(side='right', fill='both', expand=True)
 
-        # Botón para exportar gráfico a PDF
-        self.exportar_pdf_btn = tk.Button(self.right_panel, text="Exportar Gráfico a PDF", command=exportar_pdf)
-        self.exportar_pdf_btn.pack()
-
         Label(self.right_panel, text="Consulta SQL").pack()
         self.query_entry = Text(self.right_panel, height=5)
         self.query_entry.pack(fill='x')
