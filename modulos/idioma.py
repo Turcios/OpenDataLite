@@ -14,7 +14,9 @@ IDIOMAS = {
         'spanish': 'Español',
         'english': 'Inglés',
         'about_message': 'OpenDataLite - Herramienta para gestión de datos',
-        'New Date Base': 'Nueva base de datos'
+        'new_data_base': 'Nueva base de datos',
+        'import':'Importar',
+        'CSV':'Archivo CSV'
     },
     'en': {
         'menu_file': 'File',
@@ -31,7 +33,9 @@ IDIOMAS = {
         'spanish': 'Spanish',
         'english': 'English',
         'about_message': 'OpenDataLite - Data management tool',
-        'New Date Base':'New Date Base'
+        'new_data_base':'New Date Base',
+        'import':'Import',
+        'CSV':'File CSV'
     }
 } 
 

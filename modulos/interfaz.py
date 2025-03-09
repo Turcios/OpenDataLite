@@ -1,6 +1,5 @@
-
-import tkinter as tk
-from tkinter import Menu, messagebox, Frame, Label, Listbox, Text, END
+import tkinter as tk 
+from tkinter import Menu, messagebox, Frame, Label, Listbox, Text, END, ttk
 from modulos.base_datos import validar_bd
 from modulos.idioma import obtener_texto, cambiar_idioma
 from modulos.asistente import abrir_wizard, exportar_pdf
@@ -8,16 +7,13 @@ import modulos.file as file
 import os
 
 def iniciar_interface():
-    # Inicia la interfaz principal de la aplicación
     root = tk.Tk()
     root.title("OpenDataLite")
     root.geometry("1000x600")
-
     app = InterfazApp(root)
     root.mainloop()
 
 class InterfazApp:
-    
     def __init__(self, root):
         self.root = root
         self.conn = None
@@ -25,65 +21,59 @@ class InterfazApp:
         # Crear el menú principal
         self.crear_menu()
 
+        # Barra de accesos directos
+        self.crear_accesos_directos()
+
         # Frame principal
         self.main_frame = Frame(self.root)
         self.main_frame.pack(fill='both', expand=True)
 
-        # Panel izquierdo (para mostrar tablas o bases de datos)
+        # Panel izquierdo (Lista de tablas de la BD)
         self.left_panel = Frame(self.main_frame, width=200)
         self.left_panel.pack(side='left', fill='y')
-
         Label(self.left_panel, text="Tablas en la base de datos").pack()
         self.table_listbox = Listbox(self.left_panel)
         self.table_listbox.pack(fill='y', expand=True)
 
-        # Panel derecho (para consultas y asistente)
-        self.right_panel = Frame(self.main_frame)
-        self.right_panel.pack(side='right', fill='both', expand=True)
-
-        Label(self.right_panel, text="Consulta SQL").pack()
-        self.query_entry = Text(self.right_panel, height=5)
+        # Pestañas en el panel derecho
+        self.notebook = ttk.Notebook(self.main_frame)
+        self.notebook.pack(side='right', fill='both', expand=True)
+      
+        # Pestaña de Consultas
+        self.frame_consultas = Frame(self.notebook)
+        self.notebook.add(self.frame_consultas, text='Consultas')
+        Label(self.frame_consultas, text="Consulta SQL").pack()
+        self.query_entry = Text(self.frame_consultas, height=5)
         self.query_entry.pack(fill='x')
-
-        # Resultado de consultas
-        self.result_text = Text(self.right_panel)
+        self.result_text = Text(self.frame_consultas)
         self.result_text.pack(fill='both', expand=True)
-        
 
-        # Frame para el Treeview y la scrollbar
-        #self.frame_treeview = Frame(self.right_panel)
-        #self.frame_treeview.pack(expand=True, fill='both', padx=100, pady=10)
-
-        # Crear Treeview para mostrar los resultados de la consulta SQL
-        #self.treeview = ttk.Treeview(self.frame_treeview)
-        #self.treeview.pack(side="left", expand=True, fill='both')
-
-        # Agregar una barra de desplazamiento vertical
-        #self.scrollbar = ttk.Scrollbar(self.frame_treeview, orient="vertical", command=self.treeview.yview)
-        #self.treeview.configure(yscroll=self.scrollbar.set)
-        #self.scrollbar.pack(side="right", fill="y")
+        # Pestaña de Gráficos
+        self.frame_graficos = Frame(self.notebook)
+        self.notebook.add(self.frame_graficos, text='Gráficos')
+        Label(self.frame_graficos, text="Visualización de Gráficos").pack()
 
     def crear_menu(self):
-        # Crea el menú principal de la aplicación con sus submenús
         barra_menu = Menu(self.root)
-
-        # Menú Archivo
+         # Menú Archivos
         menu_archivo = Menu(barra_menu, tearoff=0)
-        menu_archivo.add_command(label=obtener_texto('menu_import_db'), command=lambda: file.nueva_archivo(self.left_panel, 1))
-        menu_archivo.add_separator()  # Separador visual entre opciones
-        menu_archivo.add_command(label=obtener_texto('New Date Base'), command=lambda: file.nueva_archivo(self.left_panel, 2))
-        menu_archivo.add_separator()
-        menu_archivo.add_command(label=obtener_texto('menu_exit'), command=self.root.quit)
-        barra_menu.add_cascade(label=obtener_texto('menu_file'), menu=menu_archivo)
+        menu_archivo.add_command(label=obtener_texto('new_data_base'), command=lambda: file.nueva_archivo(self.left_panel, 2))
 
-        # Menú Consultas
+         # Submenú de Archivos
+        menu_import = Menu(barra_menu, tearoff=0)
+        menu_import.add_command(label=obtener_texto('menu_import_db'), command=lambda: file.nueva_archivo(self.left_panel, 1))
+        menu_import.add_command(label=obtener_texto('CSV'), command=lambda: file.nueva_archivo(self.left_panel, 3))
+        menu_archivo.add_cascade(label=obtener_texto('import'), menu=menu_import)
+        #menu_archivo.add_separator()
+        barra_menu.add_cascade(label=obtener_texto('menu_file'), menu=menu_archivo)
+        
+        #Menú Consultas
         menu_consultas = Menu(barra_menu, tearoff=0)
         menu_consultas.add_command(label=obtener_texto('menu_generate_queries'), command=lambda: validar_bd(self))
         menu_consultas.add_command(label=obtener_texto('menu_query_assistant'), command=self.mostrar_asistente)
-        # Botón para exportar gráfico a PDF
         menu_consultas.add_command(label="Exportar Gráfico a PDF", command=exportar_pdf)
         barra_menu.add_cascade(label=obtener_texto('menu_queries'), menu=menu_consultas)
-
+        
         # Menú Ayuda
         menu_ayuda = Menu(barra_menu, tearoff=0)
         menu_ayuda.add_command(label=obtener_texto('menu_about'), command=self.mostrar_acerca_de)
@@ -98,31 +88,22 @@ class InterfazApp:
 
         barra_menu.add_cascade(label=obtener_texto('menu_help'), menu=menu_ayuda)
 
-        # Configurar el menú en la ventana principal
+        menu_ayuda.add_command(label=obtener_texto('menu_exit'), command=self.root.quit)
         self.root.config(menu=barra_menu)
-
-    def actualizar_panel_tablas(self):
-        # Limpiar el panel de tablas y mostrar las bases de datos locales (.db)
-        self.table_listbox.delete(0, tk.END)
-        bases_de_datos = [archivo for archivo in os.listdir('.') if archivo.endswith('.db')]
-        if not bases_de_datos:
-            self.table_listbox.insert(tk.END, 'No hay bases de datos disponibles')
-        else:
-            for archivo in bases_de_datos:
-                self.table_listbox.insert(tk.END, archivo)
-
+    
+    def crear_accesos_directos(self):
+        self.shortcut_bar = Frame(self.root, height=30, bg='#ddd')
+        self.shortcut_bar.pack(fill='x')
+        ttk.Button(self.shortcut_bar, text="Abrir", command=lambda: file.nueva_archivo(self.left_panel, 1)).pack(side='left', padx=5)
+        ttk.Button(self.shortcut_bar, text="Ejecutar", command=lambda: validar_bd(self)) .pack(side='left', padx=5)
+    
     def mostrar_asistente(self):
-        # Mostrar el asistente en el panel derecho
         self.result_text.delete("1.0", END)
         self.result_text.insert(END, "Asistente de consultas activado...")
-        abrir_wizard(self.right_panel)
-
-    def mostrar_acerca_de(self):
-        # Muestra información acerca de la aplicación
-        messagebox.showinfo("Acerca de", "OpenDataLite\nVersión 1.0\n© 2025")
-        
+        abrir_wizard(self.frame_consultas)
     
-
+    def mostrar_acerca_de(self):
+        messagebox.showinfo("Acerca de", "OpenDataLite\nVersión 1.0\n© 2025")
 
 def actualizar_textos(app):
     # Actualiza los textos del menú al cambiar de idioma.

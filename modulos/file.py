@@ -66,11 +66,11 @@ def mostrar_datos(nombre_bd, nombre_tabla, frame_izquierdo, nueva_ventana):
         nueva_ventana.destroy()
 
 # Cargar CSV en una base de datos existente
-def cargar_csv_bd(frame_izquierdo, nombre_tabla, ventana_carga):
+def cargar_csv_bd(frame_izquierdo, ventana_carga):
     try:
         conexion = sqlite3.connect(db_context["ruta_bd"])
-        df = pd.read_csv(db_context["ruta_csv"], on_bad_lines='skip')
-        df.to_sql(nombre_tabla, conexion, if_exists='replace', index=False)
+        #df = pd.read_csv(db_context["ruta_csv"], on_bad_lines='skip')
+        #df.to_sql(nombre_tabla, conexion, if_exists='replace', index=False)
         conexion.close()
         mostrar_estructura(db_context["ruta_bd"], frame_izquierdo)
         messagebox.showinfo("Éxito", "Datos agregados a la base de datos.")
@@ -81,6 +81,21 @@ def cargar_csv_bd(frame_izquierdo, nombre_tabla, ventana_carga):
 
 # Ventana para cargar una base de datos existente
 def cargar_base(frame_izquierdo):
+    ventana_carga = tk.Toplevel()
+    ventana_carga.title("OpenDataLite")
+    ventana_carga.geometry("600x400+300+200")
+
+    ventana_carga.transient(ventana_carga.master)  # Hace que la ventana dependa de la principal
+    ventana_carga.grab_set()   # Bloquea la interacción con la ventana principal
+
+    # Componentes para seleccionar archivos y tabla
+    tk.Button(ventana_carga, text="Seleccionar DB", command=lambda: seleccionar_archivo(1)).pack(pady=5)
+    tk.Button(
+        ventana_carga, text="Enviar",
+        command=lambda: cargar_csv_bd(frame_izquierdo, ventana_carga)
+    ).pack(pady=10)
+
+def cargar_csv(frame_izquierdo):
     ventana_carga = tk.Toplevel()
     ventana_carga.title("OpenDataLite")
     ventana_carga.geometry("600x400+300+200")
@@ -131,5 +146,7 @@ def mostrar_estructura(nombre_bd, frame_izquierdo):
 def nueva_archivo(frame_izquierdo, tipo):
     if tipo == 1:
         cargar_base(frame_izquierdo)
-    else:
+    elif tipo == 2:
         abrir_nueva_ventana(frame_izquierdo)
+    else:
+         cargar_csv(frame_izquierdo)
