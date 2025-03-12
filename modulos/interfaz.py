@@ -58,11 +58,10 @@ class InterfazApp:
          # Menú Archivos
         menu_archivo = Menu(barra_menu, tearoff=0)
         menu_archivo.add_command(label=obtener_texto('new_data_base'), command=lambda: file.nueva_archivo(self.left_panel, 2))
-
+        menu_archivo.add_command(label=obtener_texto('menu_import_db'), command=lambda: file.nueva_archivo(self.left_panel, self.menu_import))
          # Submenú de Archivos
         menu_import = Menu(barra_menu, tearoff=0)
-        menu_import.add_command(label=obtener_texto('menu_import_db'), command=lambda: file.nueva_archivo(self.left_panel, 1))
-        menu_import.add_command(label=obtener_texto('CSV'), command=lambda: file.nueva_archivo(self.left_panel, 3))
+        menu_import.add_command(label=obtener_texto('CSV'), command=lambda: file.nueva_archivo(self.left_panel, 1)) #, state='disabled'
         menu_archivo.add_cascade(label=obtener_texto('import'), menu=menu_import)
         #menu_archivo.add_separator()
         barra_menu.add_cascade(label=obtener_texto('menu_file'), menu=menu_archivo)
@@ -94,7 +93,7 @@ class InterfazApp:
     def crear_accesos_directos(self):
         self.shortcut_bar = Frame(self.root, height=30, bg='#ddd')
         self.shortcut_bar.pack(fill='x')
-        ttk.Button(self.shortcut_bar, text="Abrir", command=lambda: file.nueva_archivo(self.left_panel, 1)).pack(side='left', padx=5)
+        ttk.Button(self.shortcut_bar, text="Abrir", command=lambda: file.nueva_archivo(self.left_panel, 3)).pack(side='left', padx=5)
         ttk.Button(self.shortcut_bar, text="Ejecutar", command=lambda: validar_bd(self)) .pack(side='left', padx=5)
     
     def mostrar_asistente(self):

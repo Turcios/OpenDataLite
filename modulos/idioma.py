@@ -2,7 +2,7 @@ IDIOMAS = {
     'es': {
         'menu_file': 'Archivo',
         'menu_import': 'Importar',
-        'menu_import_db': 'Base de datos existente',
+        'menu_import_db': 'Abrir base de datos',
         'menu_import_csv': 'Nueva base de datos',
         'menu_exit': 'Salir',
         'menu_queries': 'Consultas',
@@ -21,7 +21,7 @@ IDIOMAS = {
     'en': {
         'menu_file': 'File',
         'menu_import': 'Import',
-        'menu_import_db': 'Existing database',
+        'menu_import_db': 'Open database',
         'menu_import_csv': 'New database',
         'menu_exit': 'Exit',
         'menu_queries': 'Queries',

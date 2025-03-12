@@ -3,9 +3,10 @@ from tkinter import messagebox, filedialog, ttk
 import pandas as pd
 import sqlite3 
 import modulos.variable as var
+from modulos.idioma import obtener_texto
 
 # Contexto para almacenar rutas y configuraciones actuales
-db_context = {"nombre_bd": None, "nombre_tabla": None, "ruta_bd": None, "ruta_csv": None}
+db_context = {"nombre_bd": None, "nombre_tabla": None,"ruta_csv": None}
 
 # Selección de archivos con un cuadro de diálogo
 def seleccionar_archivo(tipo_archivo):
@@ -13,7 +14,7 @@ def seleccionar_archivo(tipo_archivo):
     ruta_archivo = filedialog.askopenfilename(title=f"Seleccionar {tipos[tipo_archivo][0]}", filetypes=[tipos[tipo_archivo]])
     if ruta_archivo:
         if tipo_archivo == 1:
-            db_context["ruta_bd"] = ruta_archivo
+            var.ruta_bd = ruta_archivo
         else:
             db_context["ruta_csv"] = ruta_archivo
     else:
@@ -54,33 +55,47 @@ def mostrar_datos(nombre_bd, nombre_tabla, frame_izquierdo, nueva_ventana):
 
     try:
         df = pd.read_csv(db_context["ruta_csv"], on_bad_lines='skip')
-        conexion = sqlite3.connect(nombre_bd + ".db")
+        messagebox.showerror("Error", var.nombre_bd)
+        conexion = sqlite3.connect(var.nombre_bd + ".db")
         df.to_sql(nombre_tabla, conexion, if_exists='replace', index=False)
         conexion.close()
         messagebox.showinfo("Éxito", "CSV cargado exitosamente.")
         mostrar_estructura(nombre_bd + ".db", frame_izquierdo)
-        db_context.update({"nombre_bd": nombre_bd + ".db", "nombre_tabla": nombre_tabla})
+        db_context.update({"nombre_bd": var.nombre_bd + ".db", "nombre_tabla": nombre_tabla})
     except Exception as e:
         messagebox.showerror("Error", f"Error al cargar CSV: {e}")
     finally:
         nueva_ventana.destroy()
 
 # Cargar CSV en una base de datos existente
-def cargar_csv_bd(frame_izquierdo, ventana_carga):
+def cargar_csv_bd(frame_izquierdo, nombre_tabla,ventana_carga):
     try:
-        conexion = sqlite3.connect(db_context["ruta_bd"])
-        #df = pd.read_csv(db_context["ruta_csv"], on_bad_lines='skip')
-        #df.to_sql(nombre_tabla, conexion, if_exists='replace', index=False)
+        conexion = sqlite3.connect(var.ruta_bd)
+        df = pd.read_csv(db_context["ruta_csv"], on_bad_lines='skip')
+        df.to_sql(nombre_tabla, conexion, if_exists='replace', index=False)
         conexion.close()
-        mostrar_estructura(db_context["ruta_bd"], frame_izquierdo)
+        mostrar_estructura(var.ruta_bd, frame_izquierdo)
         messagebox.showinfo("Éxito", "Datos agregados a la base de datos.")
     except Exception as e:
         messagebox.showerror("Error", f"Error al cargar CSV en la base de datos: {e}")
     finally:
         ventana_carga.destroy()
 
+# Cargar CSV en una base de datos existente
+def cargar_bd(frame_izquierdo,ventana_carga, menu):
+    try:
+        conexion = sqlite3.connect(var.ruta_bd)
+        conexion.close()
+        mostrar_estructura(var.ruta_bd, frame_izquierdo)
+       # menu.entryconfig(obtener_texto('CSV'), state='normal')
+        messagebox.showinfo("Éxito", "Datos agregados a la base de datos.")
+    except Exception as e:
+        messagebox.showerror("Error", f"Error al cargar la base de datos: {e}")
+    finally:
+        ventana_carga.destroy()
+
 # Ventana para cargar una base de datos existente
-def cargar_base(frame_izquierdo):
+def cargar_base(frame_izquierdo,menu):
     ventana_carga = tk.Toplevel()
     ventana_carga.title("OpenDataLite")
     ventana_carga.geometry("600x400+300+200")
@@ -92,7 +107,7 @@ def cargar_base(frame_izquierdo):
     tk.Button(ventana_carga, text="Seleccionar DB", command=lambda: seleccionar_archivo(1)).pack(pady=5)
     tk.Button(
         ventana_carga, text="Enviar",
-        command=lambda: cargar_csv_bd(frame_izquierdo, ventana_carga)
+        command=lambda: cargar_bd(frame_izquierdo, ventana_carga, menu)
     ).pack(pady=10)
 
 def cargar_csv(frame_izquierdo):
@@ -103,8 +118,7 @@ def cargar_csv(frame_izquierdo):
     ventana_carga.transient(ventana_carga.master)  # Hace que la ventana dependa de la principal
     ventana_carga.grab_set()   # Bloquea la interacción con la ventana principal
 
-    # Componentes para seleccionar archivos y tabla
-    tk.Button(ventana_carga, text="Seleccionar DB", command=lambda: seleccionar_archivo(1)).pack(pady=5)
+    # Componentes para seleccionar tabla
     tk.Button(ventana_carga, text="Seleccionar CSV", command=lambda: seleccionar_archivo(2)).pack(pady=5)
 
     label_nombre_tabla = tk.Label(ventana_carga, text="Nombre de la tabla")
@@ -145,8 +159,8 @@ def mostrar_estructura(nombre_bd, frame_izquierdo):
 # Función principal para determinar tipo de operación
 def nueva_archivo(frame_izquierdo, tipo):
     if tipo == 1:
-        cargar_base(frame_izquierdo)
+       cargar_csv(frame_izquierdo)
     elif tipo == 2:
         abrir_nueva_ventana(frame_izquierdo)
     else:
-         cargar_csv(frame_izquierdo)
+         cargar_base(frame_izquierdo, tipo) 
