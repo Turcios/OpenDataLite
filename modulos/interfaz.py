@@ -52,17 +52,20 @@ class InterfazApp:
         self.frame_graficos = Frame(self.notebook)
         self.notebook.add(self.frame_graficos, text='Gráficos')
         Label(self.frame_graficos, text="Visualización de Gráficos").pack()
+        #menu de importar CSV
+        self.menu_import
 
     def crear_menu(self):
         barra_menu = Menu(self.root)
          # Menú Archivos
         menu_archivo = Menu(barra_menu, tearoff=0)
         menu_archivo.add_command(label=obtener_texto('new_data_base'), command=lambda: file.nueva_archivo(self.left_panel, 2))
-        menu_archivo.add_command(label=obtener_texto('menu_import_db'), command=lambda: file.nueva_archivo(self.left_panel, self.menu_import))
+        menu_archivo.add_command(label=obtener_texto('menu_import_db'), command=lambda: file.cargar_base(self.left_panel,menu_import))
          # Submenú de Archivos
         menu_import = Menu(barra_menu, tearoff=0)
-        menu_import.add_command(label=obtener_texto('CSV'), command=lambda: file.nueva_archivo(self.left_panel, 1)) #, state='disabled'
+        menu_import.add_command(label=obtener_texto('CSV'), command=lambda: file.nueva_archivo(self.left_panel, 1), state='disabled') #
         menu_archivo.add_cascade(label=obtener_texto('import'), menu=menu_import)
+        self.menu_import= menu_import 
         #menu_archivo.add_separator()
         barra_menu.add_cascade(label=obtener_texto('menu_file'), menu=menu_archivo)
         
@@ -93,7 +96,7 @@ class InterfazApp:
     def crear_accesos_directos(self):
         self.shortcut_bar = Frame(self.root, height=30, bg='#ddd')
         self.shortcut_bar.pack(fill='x')
-        ttk.Button(self.shortcut_bar, text="Abrir", command=lambda: file.nueva_archivo(self.left_panel, 3)).pack(side='left', padx=5)
+        ttk.Button(self.shortcut_bar, text="Abrir", command=lambda: file.cargar_base(self.left_panel, self.menu_import)).pack(side='left', padx=5)
         ttk.Button(self.shortcut_bar, text="Ejecutar", command=lambda: validar_bd(self)) .pack(side='left', padx=5)
     
     def mostrar_asistente(self):

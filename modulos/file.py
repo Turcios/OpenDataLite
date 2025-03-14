@@ -87,7 +87,7 @@ def cargar_bd(frame_izquierdo,ventana_carga, menu):
         conexion = sqlite3.connect(var.ruta_bd)
         conexion.close()
         mostrar_estructura(var.ruta_bd, frame_izquierdo)
-       # menu.entryconfig(obtener_texto('CSV'), state='normal')
+        menu.entryconfig(obtener_texto('CSV'), state='normal')
         messagebox.showinfo("Éxito", "Datos agregados a la base de datos.")
     except Exception as e:
         messagebox.showerror("Error", f"Error al cargar la base de datos: {e}")
@@ -162,5 +162,4 @@ def nueva_archivo(frame_izquierdo, tipo):
        cargar_csv(frame_izquierdo)
     elif tipo == 2:
         abrir_nueva_ventana(frame_izquierdo)
-    else:
-         cargar_base(frame_izquierdo, tipo) 
+         
