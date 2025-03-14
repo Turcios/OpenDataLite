@@ -159,7 +159,7 @@ def mostrar_estructura(nombre_bd, frame_izquierdo):
 # Función principal para determinar tipo de operación
 def nueva_archivo(frame_izquierdo, tipo):
     if tipo == 1:
-       cargar_csv(frame_izquierdo)
+        cargar_csv(frame_izquierdo)
     elif tipo == 2:
         abrir_nueva_ventana(frame_izquierdo)
          

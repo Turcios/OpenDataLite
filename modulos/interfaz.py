@@ -4,6 +4,9 @@ from modulos.base_datos import validar_bd
 from modulos.idioma import obtener_texto, cambiar_idioma
 from modulos.asistente import abrir_wizard, exportar_pdf
 import modulos.file as file
+import modulos.base_datos as base_datos
+import modulos.variable as var
+
 
 def iniciar_interface():
     root = tk.Tk()
@@ -46,6 +49,19 @@ class InterfazApp:
         self.query_entry.pack(fill='x')
         self.result_text = Text(self.frame_consultas)
         self.result_text.pack(fill='both', expand=True)
+        
+        # Frame para el Treeview y la scrollbar
+        self.frame_treeview = Frame(self.frame_consultas)
+        self.frame_treeview.pack(expand=True, fill='both', padx=10, pady=10)
+
+        # Crear Treeview para mostrar los resultados de la consulta SQL
+        self.treeview = ttk.Treeview(self.frame_treeview)
+        self.treeview.pack(side="left", expand=True, fill='both')
+
+        # Agregar una barra de desplazamiento vertical
+        self.scrollbar = ttk.Scrollbar(self.frame_treeview, orient="vertical", command=self.treeview.yview)
+        self.treeview.configure(yscroll=self.scrollbar.set)
+        self.scrollbar.pack(side="right", fill="y")
 
         # Pestaña de Gráficos
         self.frame_graficos = Frame(self.notebook)
@@ -53,8 +69,8 @@ class InterfazApp:
         Label(self.frame_graficos, text="Visualización de Gráficos").pack()
         
         #menu de importar CSV
-        self.menu_import
-
+        self.menu_import    
+    
     def crear_menu(self):
         barra_menu = Menu(self.root)
         # Menú Archivos
@@ -97,7 +113,8 @@ class InterfazApp:
         self.shortcut_bar = Frame(self.root, height=30, bg='#ddd')
         self.shortcut_bar.pack(fill='x')
         ttk.Button(self.shortcut_bar, text="Abrir", command=lambda: file.cargar_base(self.left_panel, self.menu_import)).pack(side='left', padx=5)
-        ttk.Button(self.shortcut_bar, text="Ejecutar", command=lambda: validar_bd(self)) .pack(side='left', padx=5)
+        self.boton_ejecutar = ttk.Button(self.shortcut_bar, text="Ejecutar", command=lambda: base_datos.ejecutar_sql(self.query_entry, self.treeview, self.result_text, var.nombre_bd))
+        self.boton_ejecutar.pack(side='left', padx=5)
     
     def mostrar_asistente(self):
         self.notebook.select(self.frame_graficos)
