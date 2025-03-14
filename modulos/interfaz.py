@@ -4,7 +4,6 @@ from modulos.base_datos import validar_bd
 from modulos.idioma import obtener_texto, cambiar_idioma
 from modulos.asistente import abrir_wizard, exportar_pdf
 import modulos.file as file
-import os
 
 def iniciar_interface():
     root = tk.Tk()
@@ -52,16 +51,17 @@ class InterfazApp:
         self.frame_graficos = Frame(self.notebook)
         self.notebook.add(self.frame_graficos, text='Gráficos')
         Label(self.frame_graficos, text="Visualización de Gráficos").pack()
+        
         #menu de importar CSV
         self.menu_import
 
     def crear_menu(self):
         barra_menu = Menu(self.root)
-         # Menú Archivos
+        # Menú Archivos
         menu_archivo = Menu(barra_menu, tearoff=0)
         menu_archivo.add_command(label=obtener_texto('new_data_base'), command=lambda: file.nueva_archivo(self.left_panel, 2))
         menu_archivo.add_command(label=obtener_texto('menu_import_db'), command=lambda: file.cargar_base(self.left_panel,menu_import))
-         # Submenú de Archivos
+        # Submenú de Archivos
         menu_import = Menu(barra_menu, tearoff=0)
         menu_import.add_command(label=obtener_texto('CSV'), command=lambda: file.nueva_archivo(self.left_panel, 1), state='disabled') #
         menu_archivo.add_cascade(label=obtener_texto('import'), menu=menu_import)
@@ -100,9 +100,9 @@ class InterfazApp:
         ttk.Button(self.shortcut_bar, text="Ejecutar", command=lambda: validar_bd(self)) .pack(side='left', padx=5)
     
     def mostrar_asistente(self):
+        self.notebook.select(self.frame_graficos)
         self.result_text.delete("1.0", END)
-        self.result_text.insert(END, "Asistente de consultas activado...")
-        abrir_wizard(self.frame_consultas)
+        abrir_wizard(self.frame_graficos)
     
     def mostrar_acerca_de(self):
         messagebox.showinfo("Acerca de", "OpenDataLite\nVersión 1.0\n© 2025")

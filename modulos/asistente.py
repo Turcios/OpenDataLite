@@ -112,7 +112,7 @@ def cargar_columnas(tablas_combo, columnas_x_combo, columnas_y_combo):
     except Exception as e:
         messagebox.showerror("Error", f"No se pudieron cargar las columnas: {e}")
 
-def generar_grafico(tablas_combo, columnas_x_combo, columnas_y_combo, tipo_grafico_combo, frame_principal):
+def generar_grafico(tablas_combo, columnas_x_combo, columnas_y_combo, tipo_grafico_combo, frame_graficos):
     """Genera un gráfico basado en la selección del usuario."""
     tabla = tablas_combo.get()
     x_col = columnas_x_combo.get()
@@ -157,7 +157,7 @@ def generar_grafico(tablas_combo, columnas_x_combo, columnas_y_combo, tipo_grafi
 
     plt.tight_layout()
 
-    grafico_frame = tk.Frame(frame_principal,  width=800, height=600)
+    grafico_frame = tk.Frame(frame_graficos,  width=800, height=600)
     grafico_frame.pack(fill="both", expand=True)
     grafico_canvas = FigureCanvasTkAgg(fig, grafico_frame)
     grafico_canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
@@ -166,9 +166,9 @@ def generar_grafico(tablas_combo, columnas_x_combo, columnas_y_combo, tipo_grafi
     fig_actual = fig
     
     
-def abrir_wizard(frame_principal):
+def abrir_wizard(frame_graficos):
     # Crear la ventana del asistente
-    wizard = frame_principal
+    wizard = frame_graficos
     global fig_actual  # Se usa una variable global para almacenar la figura
     
 
@@ -210,7 +210,7 @@ def abrir_wizard(frame_principal):
     # Paso 3: Generación del gráfico
     paso3 = ttk.Frame(wizard)
     
-    ttk.Button(paso3, text="Generar Gráfico", command=lambda: generar_grafico(tablas_combo, columnas_x_combo, columnas_y_combo, tipo_grafico_combo, frame_principal)).pack(pady=5)
+    ttk.Button(paso3, text="Generar Gráfico", command=lambda: generar_grafico(tablas_combo, columnas_x_combo, columnas_y_combo, tipo_grafico_combo, frame_graficos)).pack(pady=5)
     
 
     # Navegación entre pasos
