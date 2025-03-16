@@ -33,7 +33,7 @@ class InterfazApp:
         # Panel izquierdo (Lista de tablas de la BD)
         self.left_panel = Frame(self.main_frame, width=200)
         self.left_panel.pack(side='left', fill='y')
-        Label(self.left_panel, text="Tablas en la base de datos").pack()
+        Label(self.left_panel, text=obtener_texto('table_db')).pack()
         self.table_listbox = Listbox(self.left_panel)
         self.table_listbox.pack(fill='y', expand=True)
 
@@ -43,8 +43,8 @@ class InterfazApp:
       
         # Pestaña de Consultas
         self.frame_consultas = Frame(self.notebook)
-        self.notebook.add(self.frame_consultas, text='Consultas')
-        Label(self.frame_consultas, text="Consulta SQL").pack()
+        self.notebook.add(self.frame_consultas, text=obtener_texto('menu_queries')) 
+        Label(self.frame_consultas, text=obtener_texto('queries_SQL')).pack()
         self.query_entry = Text(self.frame_consultas, height=5)
         self.query_entry.pack(fill='x')
         self.result_text = Text(self.frame_consultas)
@@ -65,8 +65,8 @@ class InterfazApp:
 
         # Pestaña de Gráficos
         self.frame_graficos = Frame(self.notebook)
-        self.notebook.add(self.frame_graficos, text='Gráficos')
-        Label(self.frame_graficos, text="Visualización de Gráficos").pack()
+        self.notebook.add(self.frame_graficos, text=obtener_texto('charts')) 
+        Label(self.frame_graficos, text=obtener_texto('visualizing_charts')).pack()
         
         #menu de importar CSV
         self.menu_import    
@@ -112,8 +112,8 @@ class InterfazApp:
     def crear_accesos_directos(self):
         self.shortcut_bar = Frame(self.root, height=30, bg='#ddd')
         self.shortcut_bar.pack(fill='x')
-        ttk.Button(self.shortcut_bar, text="Abrir", command=lambda: file.cargar_base(self.left_panel, self.menu_import)).pack(side='left', padx=5)
-        self.boton_ejecutar = ttk.Button(self.shortcut_bar, text="Ejecutar", command=lambda: base_datos.ejecutar_sql(self.query_entry, self.treeview, self.result_text, var.nombre_bd))
+        ttk.Button(self.shortcut_bar, text=obtener_texto('menu_import_db'), command=lambda: file.cargar_base(self.left_panel, self.menu_import)).pack(side='left', padx=5)
+        self.boton_ejecutar = ttk.Button(self.shortcut_bar, text=obtener_texto('execute'), command=lambda: base_datos.ejecutar_sql(self.query_entry, self.treeview, self.result_text, var.nombre_bd))
         self.boton_ejecutar.pack(side='left', padx=5)
     
     def mostrar_asistente(self):
@@ -127,8 +127,10 @@ class InterfazApp:
 def actualizar_textos(app):
     # Actualiza los textos del menú al cambiar de idioma.
     app.crear_menu()
+    app.crear_accesos_directos()
 
 def cambiar_idioma_y_actualizar(app, idioma):
     # Cambia el idioma y actualiza los textos del menú.
     cambiar_idioma(idioma)
     actualizar_textos(app)
+    
