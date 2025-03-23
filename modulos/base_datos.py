@@ -66,7 +66,7 @@ def mostrar_resultados(treeview, columnas, filas):
     messagebox.showinfo("Éxito", "Consulta ejecutada exitosamente.")
 
 
-def ejecutar_sql(query_entry, treeview, result_text, nombre_bd):
+def ejecutar_sql(query_entry, treeview, nombre_bd):
     """Ejecuta la consulta SQL y muestra los resultados en result_text y en el Treeview."""
     sentencia_sql = query_entry.get("1.0", END).strip()
     if not sentencia_sql:
@@ -81,16 +81,10 @@ def ejecutar_sql(query_entry, treeview, result_text, nombre_bd):
         columnas, filas = ejecutar_consulta(sentencia_sql, nombre_bd)
 
         # Limpiar antes de mostrar nuevos resultados
-        result_text.delete("1.0", END)
         for item in treeview.get_children():
             treeview.delete(item)
 
         if columnas and filas:
-            # Mostrar en result_text
-            resultados_str = " | ".join(columnas) + "\n"
-            resultados_str += "-" * (len(resultados_str) + 5) + "\n"
-            resultados_str += "\n".join(" | ".join(map(str, fila)) for fila in filas)
-            result_text.insert(END, resultados_str)
 
             # Mostrar en Treeview
             treeview["columns"] = ["Índice"] + columnas
@@ -108,10 +102,8 @@ def ejecutar_sql(query_entry, treeview, result_text, nombre_bd):
 
             messagebox.showinfo("Éxito", "Consulta ejecutada exitosamente.")
         else:
-            result_text.insert(END, "No se encontraron resultados para la consulta.")
+             messagebox.showinfo("Éxito", "No se encontró resultado de la consulta")
     except Exception as e:
-        result_text.delete("1.0", END)
-        result_text.insert(END, f"Error en la consulta SQL:\n{e}")
         messagebox.showerror("Error de SQL", f"Error en la consulta SQL:\n{e}")
 
    

@@ -1,5 +1,5 @@
 import tkinter as tk 
-from tkinter import Menu, messagebox, Frame, Label, Listbox, Text, END, ttk
+from tkinter import Menu, messagebox, Frame, Label, Listbox, Text, END, ttk, Scrollbar
 from modulos.base_datos import validar_bd
 from modulos.idioma import obtener_texto, cambiar_idioma
 from modulos.asistente import abrir_wizard, exportar_pdf
@@ -43,25 +43,47 @@ class InterfazApp:
       
         # Pestaña de Consultas
         self.frame_consultas = Frame(self.notebook)
-        self.notebook.add(self.frame_consultas, text=obtener_texto('menu_queries')) 
-        Label(self.frame_consultas, text=obtener_texto('queries_SQL')).pack()
-        self.query_entry = Text(self.frame_consultas, height=5)
-        self.query_entry.pack(fill='x')
-        self.result_text = Text(self.frame_consultas)
-        self.result_text.pack(fill='both', expand=True)
-        
-        # Frame para el Treeview y la scrollbar
+        self.notebook.add(self.frame_consultas, text=obtener_texto('menu_queries'))
+
+        # Configurar el layout con grid
+        self.frame_consultas.columnconfigure(0, weight=1)
+        self.frame_consultas.rowconfigure(1, weight=1)  # Para que el frame de resultados expanda
+
+        # Frame para la entrada de consulta (Parte superior)
+        self.frame_query = Frame(self.frame_consultas)
+        self.frame_query.grid(row=0, column=0, sticky="nsew", padx=10, pady=5)
+
+        Label(self.frame_query, text=obtener_texto('queries_SQL')).pack(anchor="w")
+
+        # Frame para la entrada de consulta con scrollbar
+        self.query_text_frame = Frame(self.frame_query)
+        self.query_text_frame.pack(fill='x')
+
+        # Scrollbar para la consulta SQL
+        self.query_scrollbar = Scrollbar(self.query_text_frame, orient="vertical")
+        self.query_entry = Text(self.query_text_frame, height=5, yscrollcommand=self.query_scrollbar.set)
+        self.query_scrollbar.config(command=self.query_entry.yview)
+
+        self.query_entry.pack(side="left", fill='both', expand=True)
+        self.query_scrollbar.pack(side="right", fill="y")
+
+        # Frame para resultados (Treeview, parte inferior)
         self.frame_treeview = Frame(self.frame_consultas)
-        self.frame_treeview.pack(expand=True, fill='both', padx=10, pady=10)
+        self.frame_treeview.grid(row=1, column=0, sticky="nsew", padx=10, pady=5)
+
+        # Configurar expansión del frame_treeview
+        self.frame_consultas.rowconfigure(1, weight=1)
 
         # Crear Treeview para mostrar los resultados de la consulta SQL
         self.treeview = ttk.Treeview(self.frame_treeview)
         self.treeview.pack(side="left", expand=True, fill='both')
 
         # Agregar una barra de desplazamiento vertical
-        self.scrollbar = ttk.Scrollbar(self.frame_treeview, orient="vertical", command=self.treeview.yview)
-        self.treeview.configure(yscroll=self.scrollbar.set)
-        self.scrollbar.pack(side="right", fill="y")
+        self.tree_scrollbar = ttk.Scrollbar(self.frame_treeview, orient="vertical", command=self.treeview.yview)
+        self.treeview.configure(yscroll=self.tree_scrollbar.set)
+        self.tree_scrollbar.pack(side="right", fill="y")
+
+
 
         # Pestaña de Gráficos
         self.frame_graficos = Frame(self.notebook)
@@ -113,7 +135,7 @@ class InterfazApp:
         self.shortcut_bar = Frame(self.root, height=30, bg='#ddd')
         self.shortcut_bar.pack(fill='x')
         ttk.Button(self.shortcut_bar, text=obtener_texto('menu_import_db'), command=lambda: file.cargar_base(self.left_panel, self.menu_import)).pack(side='left', padx=5)
-        self.boton_ejecutar = ttk.Button(self.shortcut_bar, text=obtener_texto('execute'), command=lambda: base_datos.ejecutar_sql(self.query_entry, self.treeview, self.result_text, var.nombre_bd))
+        self.boton_ejecutar = ttk.Button(self.shortcut_bar, text=obtener_texto('execute'), command=lambda: base_datos.ejecutar_sql(self.query_entry, self.treeview, var.nombre_bd))
         self.boton_ejecutar.pack(side='left', padx=5)
     
     def mostrar_asistente(self):

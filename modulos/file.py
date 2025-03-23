@@ -55,13 +55,12 @@ def mostrar_datos(nombre_bd, nombre_tabla, frame_izquierdo, nueva_ventana):
 
     try:
         df = pd.read_csv(db_context["ruta_csv"], on_bad_lines='skip')
-        messagebox.showerror("Error", var.nombre_bd)
-        conexion = sqlite3.connect(var.nombre_bd + ".db")
+        conexion = sqlite3.connect(nombre_bd + ".db")
         df.to_sql(nombre_tabla, conexion, if_exists='replace', index=False)
         conexion.close()
         messagebox.showinfo("Éxito", "CSV cargado exitosamente.")
         mostrar_estructura(nombre_bd + ".db", frame_izquierdo)
-        db_context.update({"nombre_bd": var.nombre_bd + ".db", "nombre_tabla": nombre_tabla})
+        db_context.update({"nombre_bd": nombre_bd + ".db", "nombre_tabla": nombre_tabla})
     except Exception as e:
         messagebox.showerror("Error", f"Error al cargar CSV: {e}")
     finally:
