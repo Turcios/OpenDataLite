@@ -181,26 +181,23 @@ def abrir_wizard(frame_graficos):
     paso1 = ttk.Frame(wizard)
     paso1.pack(fill="both", expand=True)
 
+    ttk.Button(paso1, text="Seleccionar Base de Datos", command=seleccionar_bd).pack(pady=5)
+    ttk.Button(paso1, text="Cargar Tablas", command=lambda: cargar_tablas(tablas_combo)).pack(pady=5)
     ttk.Label(paso1, text="Selecciona una tabla:", font=("Arial", 10)).pack(pady=5)
     tablas_combo = ttk.Combobox(paso1, textvariable=tabla_seleccionada, state="readonly")
     tablas_combo.pack(pady=10)
-
-
-    ttk.Button(paso1, text="Seleccionar Base de Datos", command=seleccionar_bd).pack(pady=5)
-    ttk.Button(paso1, text="Cargar Tablas", command=lambda: cargar_tablas(tablas_combo)).pack(pady=5)
-
+    
     # Paso 2: Selección de columnas y gráfico
     paso2 = ttk.Frame(wizard)
 
-    ttk.Label(paso2, text="Selecciona columna para eje X:", font=("Arial", 10)).pack()
+    ttk.Button(paso2, text="Cargar Columnas", command=lambda: cargar_columnas(tablas_combo, columnas_x_combo, columnas_y_combo)).pack(pady=5)
+    ttk.Label(paso2, text="Selecciona columna para eje X:", font=("Arial", 10)).pack(pady=5)
     columnas_x_combo = ttk.Combobox(paso2, textvariable=columna_x, state="readonly")
     columnas_x_combo.pack()
     
-    ttk.Label(paso2, text="Selecciona columna para eje Y:", font=("Arial", 10)).pack()
+    ttk.Label(paso2, text="Selecciona columna para eje Y:", font=("Arial", 10)).pack(pady=5)
     columnas_y_combo = ttk.Combobox(paso2, textvariable=columna_y, state="readonly")
     columnas_y_combo.pack()
-    
-    ttk.Button(paso2, text="Cargar Columnas", command=lambda: cargar_columnas(tablas_combo, columnas_x_combo, columnas_y_combo)).pack()
     
 
     ttk.Label(paso2, text="Selecciona el tipo de gráfico:", font=("Arial", 10)).pack(pady=5)

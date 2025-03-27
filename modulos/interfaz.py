@@ -1,5 +1,5 @@
 import tkinter as tk 
-from tkinter import Menu, messagebox, Frame, Label, Listbox, Text, END, ttk, Scrollbar
+from tkinter import Menu, messagebox, Frame, Label, Listbox, Text, ttk, Scrollbar
 from modulos.base_datos import validar_bd
 from modulos.idioma import obtener_texto, cambiar_idioma
 from modulos.asistente import abrir_wizard, exportar_pdf
@@ -83,8 +83,6 @@ class InterfazApp:
         self.treeview.configure(yscroll=self.tree_scrollbar.set)
         self.tree_scrollbar.pack(side="right", fill="y")
 
-
-
         # Pestaña de Gráficos
         self.frame_graficos = Frame(self.notebook)
         self.notebook.add(self.frame_graficos, text=obtener_texto('charts')) 
@@ -140,7 +138,6 @@ class InterfazApp:
     
     def mostrar_asistente(self):
         self.notebook.select(self.frame_graficos)
-        self.result_text.delete("1.0", END)
         abrir_wizard(self.frame_graficos)
     
     def mostrar_acerca_de(self):
