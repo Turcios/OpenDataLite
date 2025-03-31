@@ -3,7 +3,9 @@ from tkinter import messagebox, filedialog, ttk
 import pandas as pd
 import sqlite3 
 import modulos.variable as var
+import csv
 from modulos.idioma import obtener_texto
+
 
 # Contexto para almacenar rutas y configuraciones actuales
 db_context = {"nombre_bd": None, "nombre_tabla": None,"ruta_csv": None}
@@ -56,7 +58,17 @@ def mostrar_datos(nombre_bd, nombre_tabla, frame_izquierdo, nueva_ventana):
     try:
         df = pd.read_csv(db_context["ruta_csv"], on_bad_lines='skip')
         conexion = sqlite3.connect(nombre_bd + ".db")
-        df.to_sql(nombre_tabla, conexion, if_exists='replace', index=False)
+           # Detectar automáticamente el delimitador
+        with open(db_context["ruta_csv"], 'r', encoding='utf-8') as file:
+            sample = file.read(2048)  # Leer una porción del archivo para análisis
+            dialect = csv.Sniffer().sniff(sample, delimiters="-,/.\t")  # Incluir los delimitadores permitidos
+            file.seek(0)  # Volver al inicio del archivo
+
+        # Cargar el CSV 
+        chunksize = 100000  # Ajusta este valor según la memoria disponible
+        for chunk in pd.read_csv(db_context["ruta_csv"], delimiter=dialect.delimiter, on_bad_lines='skip', chunksize=chunksize):
+            chunk.to_sql(nombre_tabla, conexion, if_exists='append', index=False)
+            
         conexion.close()
         messagebox.showinfo("Éxito", "CSV cargado exitosamente.")
         mostrar_estructura(nombre_bd + ".db", frame_izquierdo)
@@ -67,12 +79,23 @@ def mostrar_datos(nombre_bd, nombre_tabla, frame_izquierdo, nueva_ventana):
         nueva_ventana.destroy()
 
 # Cargar CSV en una base de datos existente
-def cargar_csv_bd(frame_izquierdo, nombre_tabla,ventana_carga):
+def cargar_csv_bd(frame_izquierdo, nombre_tabla, ventana_carga):
     try:
         conexion = sqlite3.connect(var.ruta_bd)
-        df = pd.read_csv(db_context["ruta_csv"], on_bad_lines='skip')
-        df.to_sql(nombre_tabla, conexion, if_exists='replace', index=False)
+
+        # Detectar automáticamente el delimitador
+        with open(db_context["ruta_csv"], 'r', encoding='utf-8') as file:
+            sample = file.read(2048)  # Leer una porción del archivo para análisis
+            dialect = csv.Sniffer().sniff(sample, delimiters=",/.–\t")  # Incluir los delimitadores permitidos
+            file.seek(0)  # Volver al inicio del archivo
+
+        # Cargar el CSV 
+        chunksize = 100000  # Ajusta este valor según la memoria disponible
+        for chunk in pd.read_csv(db_context["ruta_csv"], delimiter=dialect.delimiter, on_bad_lines='skip', chunksize=chunksize):
+            chunk.to_sql(nombre_tabla, conexion, if_exists='append', index=False)
+
         conexion.close()
+
         mostrar_estructura(var.ruta_bd, frame_izquierdo)
         messagebox.showinfo("Éxito", "Datos agregados a la base de datos.")
     except Exception as e:

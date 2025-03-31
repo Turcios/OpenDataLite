@@ -97,18 +97,19 @@ class InterfazApp:
         menu_archivo = Menu(barra_menu, tearoff=0)
         menu_archivo.add_command(label=obtener_texto('new_data_base'), command=lambda: file.nueva_archivo(self.left_panel, 2))
         menu_archivo.add_command(label=obtener_texto('menu_import_db'), command=lambda: file.cargar_base(self.left_panel,menu_import))
+        menu_archivo.add_separator()
         # Submenú de Archivos
         menu_import = Menu(barra_menu, tearoff=0)
         menu_import.add_command(label=obtener_texto('CSV'), command=lambda: file.nueva_archivo(self.left_panel, 1), state='disabled') #
         menu_archivo.add_cascade(label=obtener_texto('import'), menu=menu_import)
         self.menu_import= menu_import 
-        #menu_archivo.add_separator()
         barra_menu.add_cascade(label=obtener_texto('menu_file'), menu=menu_archivo)
         
         #Menú Consultas
         menu_consultas = Menu(barra_menu, tearoff=0)
         menu_consultas.add_command(label=obtener_texto('menu_generate_queries'), command=lambda: validar_bd(self))
         menu_consultas.add_command(label=obtener_texto('menu_query_assistant'), command=self.mostrar_asistente)
+        menu_consultas.add_separator()
         menu_consultas.add_command(label="Exportar Gráfico a PDF", command=exportar_pdf)
         barra_menu.add_cascade(label=obtener_texto('menu_queries'), menu=menu_consultas)
         
@@ -125,7 +126,7 @@ class InterfazApp:
         menu_ayuda.add_cascade(label=obtener_texto('menu_language'), menu=menu_idioma)
 
         barra_menu.add_cascade(label=obtener_texto('menu_help'), menu=menu_ayuda)
-
+        menu_ayuda.add_separator()
         menu_ayuda.add_command(label=obtener_texto('menu_exit'), command=self.root.quit)
         self.root.config(menu=barra_menu)
     
