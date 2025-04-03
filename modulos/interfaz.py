@@ -134,7 +134,7 @@ class InterfazApp:
         self.shortcut_bar = Frame(self.root, height=30, bg='#ddd')
         self.shortcut_bar.pack(fill='x')
         ttk.Button(self.shortcut_bar, text=obtener_texto('menu_import_db'), command=lambda: file.cargar_base(self.left_panel, self.menu_import)).pack(side='left', padx=5)
-        self.boton_ejecutar = ttk.Button(self.shortcut_bar, text=obtener_texto('execute'), command=lambda: base_datos.ejecutar_sql(self.query_entry, self.treeview, var.nombre_bd))
+        self.boton_ejecutar = ttk.Button(self.shortcut_bar, text=obtener_texto('execute'), command=lambda: base_datos.ejecutar_sql(self.query_entry, self.treeview, var.nombre_bd, self.root))
         self.boton_ejecutar.pack(side='left', padx=5)
     
     def mostrar_asistente(self):

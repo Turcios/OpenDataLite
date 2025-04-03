@@ -66,7 +66,7 @@ def mostrar_resultados(treeview, columnas, filas):
     messagebox.showinfo("Éxito", "Consulta ejecutada exitosamente.")
 
 
-def ejecutar_sql(query_entry, treeview, nombre_bd):
+def ejecutar_sql(query_entry, treeview, nombre_bd, root):
     """Ejecuta la consulta SQL y muestra los resultados en result_text y en el Treeview."""
     sentencia_sql = query_entry.get("1.0", END).strip()
     if not sentencia_sql:
@@ -78,6 +78,22 @@ def ejecutar_sql(query_entry, treeview, nombre_bd):
         return
 
     try:
+        # Crear ventana de carga
+        loading_message = tk.Toplevel(root)
+        loading_message.title("Cargando")
+        loading_message.geometry("300x100")
+        
+        # Centrar ventana de carga
+        root.update_idletasks()
+        x = root.winfo_x() + (root.winfo_width() // 2 - 150)
+        y = root.winfo_y() + (root.winfo_height() // 2 - 50)
+        loading_message.geometry(f"300x100+{x}+{y}")
+        
+        loading_message.transient(root)
+        loading_message.grab_set()
+        
+        tk.Label(loading_message, text="Ejecutando consulta, por favor espere...").pack(expand=True)
+        loading_message.update()
         columnas, filas = ejecutar_consulta(sentencia_sql, nombre_bd)
 
         # Limpiar antes de mostrar nuevos resultados
@@ -105,15 +121,10 @@ def ejecutar_sql(query_entry, treeview, nombre_bd):
              messagebox.showinfo("Éxito", "No se encontró resultado de la consulta")
     except Exception as e:
         messagebox.showerror("Error de SQL", f"Error en la consulta SQL:\n{e}")
+    finally:
+        loading_message.destroy()
 
-   
 
-    # Ejecutar la consulta y obtener los resultados
-    #columnas, filas = ejecutar_consulta(sentencia_sql, nombre_bd)
-    
-    # Mostrar los resultados en el Treeview
-    #mostrar_resultados(Treeview, columnas, filas)
-    
 def validar_bd(self):
     """Ejecuta la consulta y muestra los resultados en una tabla en lugar del cuadro de texto."""
     if not hasattr(var, 'nombre_bd') or not var.nombre_bd:
