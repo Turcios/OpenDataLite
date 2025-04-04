@@ -66,7 +66,10 @@ class InterfazApp:
 
         self.query_entry.pack(side="left", fill='both', expand=True)
         self.query_scrollbar.pack(side="right", fill="y")
-
+        # Exportar consulta
+        self.export_query_button = ttk.Button(self.frame_query, text="Exportar Consulta", command=lambda:base_datos.exportar_consulta(self.query_entry))
+        self.export_query_button.pack(side="right", padx=10, pady=5)
+           
         # Frame para resultados (Treeview, parte inferior)
         self.frame_treeview = Frame(self.frame_consultas)
         self.frame_treeview.grid(row=1, column=0, sticky="nsew", padx=10, pady=5)
@@ -87,7 +90,38 @@ class InterfazApp:
         self.frame_graficos = Frame(self.notebook)
         self.notebook.add(self.frame_graficos, text=obtener_texto('charts')) 
         Label(self.frame_graficos, text=obtener_texto('visualizing_charts')).pack()
-        
+        # Frame para resultados (Treeview, parte inferior)
+        self.frame_treeview = Frame(self.frame_consultas)
+        self.frame_treeview.grid(row=1, column=0, sticky="nsew", padx=10, pady=5)
+
+        # Scrollbars
+        self.tree_scrollbar_y = ttk.Scrollbar(self.frame_treeview, orient="vertical")
+        self.tree_scrollbar_x = ttk.Scrollbar(self.frame_treeview, orient="horizontal")
+
+        # Crear Treeview con los scrollbars configurados
+        self.treeview = ttk.Treeview(
+            self.frame_treeview,
+            yscrollcommand=self.tree_scrollbar_y.set,
+            xscrollcommand=self.tree_scrollbar_x.set
+        )
+
+        # Configurar los scrollbars para que controlen el Treeview
+        self.tree_scrollbar_y.config(command=self.treeview.yview)
+        self.tree_scrollbar_x.config(command=self.treeview.xview)
+
+        # Empaquetar los widgets correctamente
+        self.treeview.grid(row=0, column=0, sticky="nsew")
+        self.tree_scrollbar_y.grid(row=0, column=1, sticky="ns")  # Vertical a la derecha
+        self.tree_scrollbar_x.grid(row=1, column=0, sticky="ew")  # Horizontal abajo
+
+        # Permitir que el Treeview se expanda en el frame
+        self.frame_treeview.columnconfigure(0, weight=1)
+        self.frame_treeview.rowconfigure(0, weight=1)
+
+        # Exportar resultados 
+        self.export_tree_button = ttk.Button(self.frame_treeview, text="Exportar Resultados") #, command=self.exportar_resultados
+        self.export_tree_button.grid(row=2, column=0, columnspan=2, pady=5, sticky="e", padx=10, ipadx=10)
+
         #menu de importar CSV
         self.menu_import    
     

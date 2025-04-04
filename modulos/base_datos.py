@@ -139,3 +139,18 @@ def validar_bd(self):
     columnas, resultados = ejecutar_consulta(query, var.nombre_bd)
     
     mostrar_resultados(self, columnas, resultados)
+
+def exportar_consulta(query_entry):
+    """Guarda el contenido del query_entry en un archivo de texto."""
+    consulta = query_entry.get("1.0", "end").strip()  # Aquí usamos app.query_entry
+
+    if not consulta:
+        messagebox.showwarning("Advertencia", "No hay consulta para exportar.")
+        return
+
+    file_path = filedialog.asksaveasfilename(defaultextension=".sql", filetypes=[("SQL files", "*.sql"), ("Text files", "*.txt")])
+
+    if file_path:
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(consulta)
+        messagebox.showinfo("Éxito", "Consulta exportada correctamente.")
