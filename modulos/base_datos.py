@@ -1,3 +1,4 @@
+import csv
 import sqlite3
 import tkinter as tk
 from tkinter import END, filedialog, messagebox
@@ -154,3 +155,32 @@ def exportar_consulta(query_entry):
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(consulta)
         messagebox.showinfo("Éxito", "Consulta exportada correctamente.")
+        
+def exportar_resultados_csv(self):
+    """Exporta los resultados del Treeview a un archivo CSV."""
+    # Obtener columnas
+    columnas = [self.treeview.heading(col)["text"] for col in self.treeview["columns"]]
+
+    # Obtener datos
+    filas = []
+    for item in self.treeview.get_children():
+        fila = self.treeview.item(item)["values"]
+        filas.append(fila)
+
+    if not filas:
+        messagebox.showwarning("Advertencia", "No hay resultados para exportar.")
+        return
+
+    # Pedir ubicación de guardado
+    file_path = filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("CSV files", "*.csv")])
+    if not file_path:
+        return
+
+    # Escribir archivo CSV
+    with open(file_path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(columnas)  # Escribir encabezados
+        writer.writerows(filas)    # Escribir datos
+
+    messagebox.showinfo("Éxito", "Resultados exportados correctamente.")
+

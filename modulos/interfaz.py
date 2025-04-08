@@ -119,7 +119,7 @@ class InterfazApp:
         self.frame_treeview.rowconfigure(0, weight=1)
 
         # Exportar resultados 
-        self.export_tree_button = ttk.Button(self.frame_treeview, text="Exportar Resultados") #, command=self.exportar_resultados
+        self.export_tree_button = ttk.Button(self.frame_treeview, text="Exportar Resultados", command=lambda:base_datos.exportar_resultados_csv(self))
         self.export_tree_button.grid(row=2, column=0, columnspan=2, pady=5, sticky="e", padx=10, ipadx=10)
 
         #menu de importar CSV
