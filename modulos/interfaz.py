@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import Menu, messagebox, Frame, Label, Listbox, Text, ttk, Scrollbar
 from modulos.base_datos import validar_bd
 from modulos.idioma import obtener_texto, cambiar_idioma
-from modulos.asistente import abrir_wizard, exportar_pdf
+from modulos.asistente import AsistenteGraficos
 import modulos.file as file
 import modulos.base_datos as base_datos
 import modulos.variable as var
@@ -19,12 +19,7 @@ class InterfazApp:
     def __init__(self, root):
         self.root = root
         self.conn = None
-
-        # Crear el menú principal
-        self.crear_menu()
-
-        # Barra de accesos directos
-        self.crear_accesos_directos()
+        self.menu_import = None
 
         # Frame principal
         self.main_frame = Frame(self.root)
@@ -90,6 +85,9 @@ class InterfazApp:
         self.frame_graficos = Frame(self.notebook)
         self.notebook.add(self.frame_graficos, text=obtener_texto('charts')) 
         Label(self.frame_graficos, text=obtener_texto('visualizing_charts')).pack()
+        # Aquí se instancia el asistente como clase
+        self.asistente = AsistenteGraficos(self.frame_graficos)
+        
         # Frame para resultados (Treeview, parte inferior)
         self.frame_treeview = Frame(self.frame_consultas)
         self.frame_treeview.grid(row=1, column=0, sticky="nsew", padx=10, pady=5)
@@ -123,7 +121,12 @@ class InterfazApp:
         self.export_tree_button.grid(row=2, column=0, columnspan=2, pady=5, sticky="e", padx=10, ipadx=10)
 
         #menu de importar CSV
-        self.menu_import    
+        self.menu_import  
+        
+        # Crear el menú principal
+        self.crear_menu() 
+        # Barra de accesos directos
+        self.crear_accesos_directos() 
     
     def crear_menu(self):
         barra_menu = Menu(self.root)
@@ -144,7 +147,7 @@ class InterfazApp:
         menu_consultas.add_command(label=obtener_texto('menu_generate_queries'), command=lambda: validar_bd(self))
         menu_consultas.add_command(label=obtener_texto('menu_query_assistant'), command=self.mostrar_asistente)
         menu_consultas.add_separator()
-        menu_consultas.add_command(label="Exportar Gráfico a PDF", command=exportar_pdf)
+        menu_consultas.add_command(label="Exportar Gráfico a PDF", command=self.asistente.exportar_pdf)
         barra_menu.add_cascade(label=obtener_texto('menu_queries'), menu=menu_consultas)
         
         # Menú Ayuda
@@ -173,7 +176,7 @@ class InterfazApp:
     
     def mostrar_asistente(self):
         self.notebook.select(self.frame_graficos)
-        abrir_wizard(self.frame_graficos)
+        #abrir_wizard(self.frame_graficos)
     
     def mostrar_acerca_de(self):
         messagebox.showinfo("Acerca de", "OpenDataLite\nVersión 1.0\n© 2025")
