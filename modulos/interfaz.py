@@ -21,6 +21,12 @@ class InterfazApp:
         self.conn = None
         self.menu_import = None
 
+        # Crear el menú principal
+        self.crear_menu()
+
+        # Barra de accesos directos
+        self.crear_accesos_directos()
+
         # Frame principal
         self.main_frame = Frame(self.root)
         self.main_frame.pack(fill='both', expand=True)
@@ -61,10 +67,13 @@ class InterfazApp:
 
         self.query_entry.pack(side="left", fill='both', expand=True)
         self.query_scrollbar.pack(side="right", fill="y")
-        # Exportar consulta
+        self.query_entry.insert("1.0", "--Ejemplo:\n--SELECT * FROM nombre_tabla; \n--SELECT * FROM nombre_tabla WHERE nombre_columna = valor;")
+        # Exportar y ejecutar consulta
+        self.boton_ejecutar = ttk.Button(self.frame_query, text=obtener_texto('execute'), command=lambda: base_datos.ejecutar_sql(self.query_entry, self.treeview, var.nombre_bd, self.root))
+        self.boton_ejecutar.pack(side="right", padx=10, pady=5) 
         self.export_query_button = ttk.Button(self.frame_query, text="Exportar Consulta", command=lambda:base_datos.exportar_consulta(self.query_entry))
         self.export_query_button.pack(side="right", padx=10, pady=5)
-           
+         
         # Frame para resultados (Treeview, parte inferior)
         self.frame_treeview = Frame(self.frame_consultas)
         self.frame_treeview.grid(row=1, column=0, sticky="nsew", padx=10, pady=5)
@@ -147,7 +156,7 @@ class InterfazApp:
         menu_consultas.add_command(label=obtener_texto('menu_generate_queries'), command=lambda: validar_bd(self))
         menu_consultas.add_command(label=obtener_texto('menu_query_assistant'), command=self.mostrar_asistente)
         menu_consultas.add_separator()
-        menu_consultas.add_command(label="Exportar Gráfico a PDF", command=self.asistente.exportar_pdf)
+        menu_consultas.add_command(label="Exportar Gráfico a PDF") #command=self.asistente.generar_grafico)
         barra_menu.add_cascade(label=obtener_texto('menu_queries'), menu=menu_consultas)
         
         # Menú Ayuda
@@ -171,8 +180,6 @@ class InterfazApp:
         self.shortcut_bar = Frame(self.root, height=30, bg='#ddd')
         self.shortcut_bar.pack(fill='x')
         ttk.Button(self.shortcut_bar, text=obtener_texto('menu_import_db'), command=lambda: file.cargar_base(self.left_panel, self.menu_import)).pack(side='left', padx=5)
-        self.boton_ejecutar = ttk.Button(self.shortcut_bar, text=obtener_texto('execute'), command=lambda: base_datos.ejecutar_sql(self.query_entry, self.treeview, var.nombre_bd, self.root))
-        self.boton_ejecutar.pack(side='left', padx=5)
     
     def mostrar_asistente(self):
         self.notebook.select(self.frame_graficos)
@@ -190,4 +197,3 @@ def cambiar_idioma_y_actualizar(app, idioma):
     # Cambia el idioma y actualiza los textos del menú.
     cambiar_idioma(idioma)
     actualizar_textos(app)
-    
