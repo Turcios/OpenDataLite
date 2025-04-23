@@ -8,7 +8,7 @@ IDIOMAS = {
         'menu_queries': 'Consultas',
         'queries_SQL':'Consulta SQL',
         'menu_generate_queries': 'Generar consultas',
-        'menu_query_assistant': 'Asistente de gráficos',
+        'menu_query_assistant': 'Asistente de consultas',
         'menu_help': 'Ayuda',
         'menu_about': 'Acerca de',
         'menu_language': 'Idioma',

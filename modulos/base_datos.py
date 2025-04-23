@@ -2,6 +2,7 @@ import csv
 import sqlite3
 import tkinter as tk
 from tkinter import END, filedialog, messagebox
+from tkinter.ttk import Treeview
 import modulos.variable as var
 
 
@@ -118,7 +119,7 @@ def ejecutar_sql(query_entry, treeview, nombre_bd, root):
 
             messagebox.showinfo("Éxito", "Consulta ejecutada exitosamente.")
         else:
-            messagebox.showinfo("Éxito", "No se encontró resultado de la consulta")
+             messagebox.showinfo("Éxito", "No se encontró resultado de la consulta")
     except Exception as e:
         messagebox.showerror("Error de SQL", f"Error en la consulta SQL:\n{e}")
     finally:
