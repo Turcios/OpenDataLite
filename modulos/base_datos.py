@@ -2,7 +2,6 @@ import csv
 import sqlite3
 import tkinter as tk
 from tkinter import END, filedialog, messagebox
-from tkinter.ttk import Treeview
 import modulos.variable as var
 
 
@@ -119,7 +118,7 @@ def ejecutar_sql(query_entry, treeview, nombre_bd, root):
 
             messagebox.showinfo("Éxito", "Consulta ejecutada exitosamente.")
         else:
-             messagebox.showinfo("Éxito", "No se encontró resultado de la consulta")
+            messagebox.showinfo("Éxito", "No se encontró resultado de la consulta")
     except Exception as e:
         messagebox.showerror("Error de SQL", f"Error en la consulta SQL:\n{e}")
     finally:
@@ -142,18 +141,28 @@ def validar_bd(self):
     mostrar_resultados(self, columnas, resultados)
 
 def exportar_consulta(query_entry):
-    """Guarda el contenido del query_entry en un archivo de texto."""
-    consulta = query_entry.get("1.0", "end").strip()  # Aquí usamos app.query_entry
+    """Guarda el contenido del query_entry en un archivo de texto, excluyendo comentarios."""
+    consulta = query_entry.get("1.0", "end").strip()
 
-    if not consulta:
-        messagebox.showwarning("Advertencia", "No hay consulta para exportar.")
+    # Filtrar líneas que no empiezan con comentarios '--'
+    lineas_validas = [
+        linea for linea in consulta.splitlines()
+        if not linea.strip().startswith('--') and linea.strip() != ''
+    ]
+    consulta_sin_comentarios = "\n".join(lineas_validas)
+
+    if not consulta_sin_comentarios:
+        messagebox.showwarning("Advertencia", "No hay consulta válida para exportar.")
         return
 
-    file_path = filedialog.asksaveasfilename(defaultextension=".sql", filetypes=[("SQL files", "*.sql"), ("Text files", "*.txt")])
+    file_path = filedialog.asksaveasfilename(
+        defaultextension=".sql",
+        filetypes=[("SQL files", "*.sql"), ("Text files", "*.txt")]
+    )
 
     if file_path:
         with open(file_path, "w", encoding="utf-8") as f:
-            f.write(consulta)
+            f.write(consulta_sin_comentarios)
         messagebox.showinfo("Éxito", "Consulta exportada correctamente.")
         
 def exportar_resultados_csv(self):
