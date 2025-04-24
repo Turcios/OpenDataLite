@@ -2,7 +2,8 @@ import tkinter as tk
 from tkinter import Menu, messagebox, Frame, Label, Listbox, Text, ttk, Scrollbar
 from modulos.base_datos import validar_bd
 from modulos.idioma import obtener_texto, cambiar_idioma
-from modulos.asistente import AsistenteGraficos
+#from modulos.asistente import AsistenteGraficos
+from modulos.asistente import abrir_wizard, exportar_pdf
 import modulos.file as file
 import modulos.base_datos as base_datos
 import modulos.variable as var
@@ -95,7 +96,7 @@ class InterfazApp:
         self.notebook.add(self.frame_graficos, text=obtener_texto('charts')) 
         Label(self.frame_graficos, text=obtener_texto('visualizing_charts')).pack()
         # Aquí se instancia el asistente como clase
-        self.asistente = AsistenteGraficos(self.frame_graficos)
+        #self.asistente = AsistenteGraficos(self.frame_graficos)
         
         # Frame para resultados (Treeview, parte inferior)
         self.frame_treeview = Frame(self.frame_consultas)

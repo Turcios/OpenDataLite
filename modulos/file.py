@@ -103,34 +103,23 @@ def cargar_csv_bd(frame_izquierdo, nombre_tabla, ventana_carga):
     finally:
         ventana_carga.destroy()
 
-# Cargar CSV en una base de datos existente
-def cargar_bd(frame_izquierdo,ventana_carga, menu):
-    try:
-        conexion = sqlite3.connect(var.ruta_bd)
-        conexion.close()
-        mostrar_estructura(var.ruta_bd, frame_izquierdo)
-        menu.entryconfig(obtener_texto('CSV'), state='normal')
-        messagebox.showinfo("Éxito", "Datos agregados a la base de datos.")
-    except Exception as e:
-        messagebox.showerror("Error", f"Error al cargar la base de datos: {e}")
-    finally:
-        ventana_carga.destroy()
-
 # Ventana para cargar una base de datos existente
-def cargar_base(frame_izquierdo,menu):
-    ventana_carga = tk.Toplevel()
-    ventana_carga.title("OpenDataLite")
-    ventana_carga.geometry("600x400+300+200")
-
-    ventana_carga.transient(ventana_carga.master)  # Hace que la ventana dependa de la principal
-    ventana_carga.grab_set()   # Bloquea la interacción con la ventana principal
-
-    # Componentes para seleccionar archivos y tabla
-    tk.Button(ventana_carga, text="Seleccionar DB", command=lambda: seleccionar_archivo(1)).pack(pady=5)
-    tk.Button(
-        ventana_carga, text="Enviar",
-        command=lambda: cargar_bd(frame_izquierdo, ventana_carga, menu)
-    ).pack(pady=10)
+def cargar_base(frame_izquierdo, menu):
+    archivo = filedialog.askopenfilename(
+        title="Seleccionar base de datos SQLite",
+        filetypes=[("SQLite files", "*.sqlite *.db"), ("Todos los archivos", "*.*")]
+    )
+    
+    if archivo:
+        try:
+            var.ruta_bd = archivo  # Asignamos el archivo seleccionado a la variable global
+            conexion = sqlite3.connect(var.ruta_bd)
+            conexion.close()
+            mostrar_estructura(var.ruta_bd, frame_izquierdo)
+            menu.entryconfig(obtener_texto('CSV'), state='normal')
+            messagebox.showinfo("Éxito", "Base de datos cargada correctamente.")
+        except Exception as e:
+            messagebox.showerror("Error", f"Error al cargar la base de datos: {e}")
 
 def cargar_csv(frame_izquierdo):
     ventana_carga = tk.Toplevel()
