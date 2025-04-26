@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import Menu, messagebox, Frame, Label, Listbox, Text, ttk, Scrollbar
 from modulos.base_datos import validar_bd
 from modulos.idioma import obtener_texto, cambiar_idioma
-#from modulos.asistente import AsistenteGraficos
 from modulos.asistente import abrir_wizard, exportar_pdf
 import modulos.file as file
 import modulos.base_datos as base_datos
@@ -157,7 +156,7 @@ class InterfazApp:
         menu_consultas.add_command(label=obtener_texto('menu_generate_queries'), command=lambda: validar_bd(self))
         menu_consultas.add_command(label=obtener_texto('menu_query_assistant'), command=self.mostrar_asistente)
         menu_consultas.add_separator()
-        menu_consultas.add_command(label="Exportar Gráfico a PDF") #command=self.asistente.generar_grafico)
+        menu_consultas.add_command(label="Exportar Gráfico a PDF", command=exportar_pdf)
         barra_menu.add_cascade(label=obtener_texto('menu_queries'), menu=menu_consultas)
         
         # Menú Ayuda
@@ -184,7 +183,7 @@ class InterfazApp:
     
     def mostrar_asistente(self):
         self.notebook.select(self.frame_graficos)
-        #abrir_wizard(self.frame_graficos)
+        abrir_wizard(self.frame_graficos)
     
     def mostrar_acerca_de(self):
         messagebox.showinfo("Acerca de", "OpenDataLite\nVersión 1.0\n© 2025")
