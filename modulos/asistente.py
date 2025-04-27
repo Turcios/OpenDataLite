@@ -164,56 +164,136 @@ def volver(root):
         widget.destroy()
     abrir_wizard(root)
     
+import tkinter as tk
+from tkinter import ttk
+
 def abrir_wizard(frame_graficos):
-    # Crear la ventana del asistente
+    # Variables
     tabla = tk.StringVar()
     columna_x = tk.StringVar()
     columna_y = tk.StringVar()
     tipo_grafico = tk.StringVar(value="Barras")
 
-    contenedor = ttk.Frame(frame_graficos)
+    # Contenedor principal
+    contenedor = ttk.Frame(frame_graficos, padding=10)
     contenedor.pack(fill="both", expand=True)
 
     contenedor.columnconfigure(0, weight=1)
     contenedor.columnconfigure(1, weight=2)
+    contenedor.rowconfigure(0, weight=1)
 
-    formulario_frame = ttk.Frame(contenedor)
-    formulario_frame.grid(row=0, column=0, sticky="nw", padx=10, pady=10)
+    # --------- FORMULARIO IZQUIERDA CON SCROLL ----------
+    formulario_canvas = tk.Canvas(contenedor, borderwidth=0, highlightthickness=0)
+    formulario_scrollbar = ttk.Scrollbar(contenedor, orient="vertical", command=formulario_canvas.yview)
+    formulario_canvas.configure(yscrollcommand=formulario_scrollbar.set)
 
-    #ttk.Button(formulario_frame, text="Seleccionar Base de Datos", command=seleccionar_bd).grid(row=0, column=0, sticky="w", pady=2)
-    ttk.Button(formulario_frame, text="Cargar Tablas", command=lambda: cargar_tablas(tablas_combo)).grid(row=0, column=0, sticky="w", pady=2)
-    ttk.Label(formulario_frame, text="Tabla:").grid(row=1, column=0, sticky="w")
-    tablas_combo = ttk.Combobox(formulario_frame, textvariable=tabla, state="readonly")
+    formulario_canvas.grid(row=0, column=0, sticky="nsew", padx=(0,10), pady=(0,10))
+    formulario_scrollbar.grid(row=0, column=0, sticky="nse", padx=(0,0), pady=(0,10))
+
+    formulario_frame = ttk.LabelFrame(formulario_canvas, text="Configuración", padding=(15, 10))
+    formulario_id = formulario_canvas.create_window((0, 0), window=formulario_frame, anchor="nw")
+
+def abrir_wizard(frame_graficos):
+    # Variables
+    tabla = tk.StringVar()
+    columna_x = tk.StringVar()
+    columna_y = tk.StringVar()
+    tipo_grafico = tk.StringVar(value="Barras")
+
+    # Contenedor principal
+    contenedor = ttk.Frame(frame_graficos, padding=10)
+    contenedor.pack(fill="both", expand=True)
+
+    contenedor.columnconfigure(0, weight=1)
+    contenedor.columnconfigure(1, weight=2)
+    contenedor.rowconfigure(0, weight=1)
+    contenedor.rowconfigure(1, weight=1)
+
+    # -------- FORMULARIO CON SCROLLBAR ----------
+    formulario_frame = ttk.LabelFrame(contenedor, text="Configuración", padding=(0,0))
+    formulario_frame.grid(row=0, column=0, sticky="nsew", padx=(0,10), pady=(0,10))
+
+    formulario_canvas = tk.Canvas(formulario_frame, borderwidth=0, highlightthickness=0)
+    formulario_scrollbar = ttk.Scrollbar(formulario_frame, orient="vertical", command=formulario_canvas.yview)
+    formulario_scrollbar.pack(side="right", fill="y")
+    formulario_canvas.pack(side="left", fill="both", expand=True)
+
+    formulario_interior = ttk.Frame(formulario_canvas, padding=10)
+    formulario_interior.bind(
+        "<Configure>",
+        lambda e: formulario_canvas.configure(
+            scrollregion=formulario_canvas.bbox("all")
+        )
+    )
+
+    interior_id = formulario_canvas.create_window((0, 0), window=formulario_interior, anchor="nw")
+    formulario_canvas.configure(yscrollcommand=formulario_scrollbar.set)
+
+    # Ajustar el ancho del interior al ancho del canvas
+    def ajustar_ancho(event):
+        canvas_width = event.width
+        formulario_canvas.itemconfig(interior_id, width=canvas_width)
+
+    formulario_canvas.bind("<Configure>", ajustar_ancho)
+
+    # Para permitir el scroll con la rueda del mouse
+    def _on_mousewheel(event):
+        formulario_canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+
+    formulario_canvas.bind_all("<MouseWheel>", _on_mousewheel)
+
+    # ------- WIDGETS del formulario -------
+    formulario_interior.columnconfigure(0, weight=1)
+
+    ttk.Button(formulario_interior, text="Cargar Tablas", command=lambda: cargar_tablas(tablas_combo)).grid(row=0, column=0, sticky="ew", pady=5)
+
+    ttk.Label(formulario_interior, text="Tabla:").grid(row=1, column=0, sticky="w", pady=(10,2))
+    tablas_combo = ttk.Combobox(formulario_interior, textvariable=tabla, state="readonly")
     tablas_combo.grid(row=2, column=0, sticky="ew", pady=2)
-    
-    ttk.Button(formulario_frame, text="Cargar Columnas", command=lambda: cargar_columnas(tabla, columnas_x_combo, columnas_y_combo, vista)).grid(row=3, column=0, sticky="w", pady=2)
-    ttk.Label(formulario_frame, text="Columna X:").grid(row=4, column=0, sticky="w")
-    columnas_x_combo = ttk.Combobox(formulario_frame, textvariable=columna_x, state="readonly")
+
+    ttk.Button(formulario_interior, text="Cargar Columnas", command=lambda: cargar_columnas(tabla, columnas_x_combo, columnas_y_combo, vista)).grid(row=3, column=0, sticky="ew", pady=10)
+
+    ttk.Label(formulario_interior, text="Columna X:").grid(row=4, column=0, sticky="w", pady=(10,2))
+    columnas_x_combo = ttk.Combobox(formulario_interior, textvariable=columna_x, state="readonly")
     columnas_x_combo.grid(row=5, column=0, sticky="ew", pady=2)
 
-    ttk.Label(formulario_frame, text="Columna Y:").grid(row=6, column=0, sticky="w")
-    columnas_y_combo = ttk.Combobox(formulario_frame, textvariable=columna_y, state="readonly")
+    ttk.Label(formulario_interior, text="Columna Y:").grid(row=6, column=0, sticky="w", pady=(10,2))
+    columnas_y_combo = ttk.Combobox(formulario_interior, textvariable=columna_y, state="readonly")
     columnas_y_combo.grid(row=7, column=0, sticky="ew", pady=2)
 
-    ttk.Label(formulario_frame, text="Tipo de gráfico:").grid(row=8, column=0, sticky="w")
-    tipo_grafico_combo = ttk.Combobox(formulario_frame, textvariable=tipo_grafico, values=["Barras", "Líneas", "Pastel"], state="readonly")
+    ttk.Label(formulario_interior, text="Tipo de gráfico:").grid(row=8, column=0, sticky="w", pady=(10,2))
+    tipo_grafico_combo = ttk.Combobox(formulario_interior, textvariable=tipo_grafico, values=["Barras", "Líneas", "Pastel"], state="readonly")
     tipo_grafico_combo.grid(row=9, column=0, sticky="ew", pady=2)
 
-    volver_btn = ttk.Button(formulario_frame, text="← Volver", command=lambda: volver(frame_graficos))
-    volver_btn.grid(row=10, column=0, pady=5)
+    volver_btn = ttk.Button(formulario_interior, text="← Volver", command=lambda: volver(frame_graficos))
+    volver_btn.grid(row=10, column=0, pady=15)
     volver_btn.grid_remove()
 
-    ttk.Button(formulario_frame, text="Generar Gráfico", command=lambda: generar_grafico(tabla, columna_x, columna_y, tipo_grafico, grafico_frame, volver_btn)).grid(row=11, column=0, pady=10)
+    # ------- VISTA PREVIA + BOTON ----------
+    vista_y_boton_frame = ttk.Frame(contenedor)
+    vista_y_boton_frame.grid(row=0, column=1, sticky="nsew", pady=(0,10))
 
-    vista_frame = ttk.Frame(contenedor)
-    vista_frame.grid(row=0, column=1, sticky="nsew", padx=10, pady=10)
+    vista_y_boton_frame.columnconfigure(0, weight=1)
+    vista_y_boton_frame.rowconfigure(0, weight=1)
 
-    vista = tk.Text(vista_frame, height=10, wrap="none")
+    vista_frame = ttk.LabelFrame(vista_y_boton_frame, text="Vista previa de Consulta", padding=(10,10))
+    vista_frame.grid(row=0, column=0, sticky="nsew")
+
+    vista_scroll = ttk.Scrollbar(vista_frame)
+    vista_scroll.pack(side="right", fill="y")
+
+    vista = tk.Text(vista_frame, height=10, wrap="none", background="#f5f5f5", relief="flat", yscrollcommand=vista_scroll.set)
     vista.pack(fill="both", expand=True)
-    vista.config(state="disabled", bg="#f5f5f5")
+    vista.config(state="disabled")
+    vista_scroll.config(command=vista.yview)
 
-    grafico_frame = tk.Frame(contenedor, bg="white", height=300)
-    grafico_frame.grid(row=1, column=0, columnspan=2, sticky="nsew", padx=10, pady=10)
+    generar_btn = ttk.Button(vista_y_boton_frame, text="Generar Gráfico", command=lambda: generar_grafico(tabla, columna_x, columna_y, tipo_grafico, grafico_frame, volver_btn))
+    generar_btn.grid(row=1, column=0, sticky="ew", pady=(10,0))
+
+    # ------- GRAFICO ABAJO ----------
+    grafico_frame = ttk.LabelFrame(contenedor, text="Gráfico", padding=(10, 10))
+    grafico_frame.grid(row=1, column=0, columnspan=2, sticky="nsew")
+    grafico_frame.configure(height=300)
     grafico_frame.pack_propagate(False)
 
 

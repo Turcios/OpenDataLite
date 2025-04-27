@@ -44,7 +44,7 @@ class InterfazApp:
       
         # Pestaña de Consultas
         self.frame_consultas = Frame(self.notebook)
-        self.notebook.add(self.frame_consultas, text=obtener_texto('menu_queries'))
+        self.notebook.add(self.frame_consultas, text=obtener_texto('queries'))
 
         # Configurar el layout con grid
         self.frame_consultas.columnconfigure(0, weight=1)
@@ -134,8 +134,6 @@ class InterfazApp:
         
         # Crear el menú principal
         self.crear_menu() 
-        # Barra de accesos directos
-        self.crear_accesos_directos() 
     
     def crear_menu(self):
         barra_menu = Menu(self.root)
@@ -151,11 +149,9 @@ class InterfazApp:
         self.menu_import= menu_import 
         barra_menu.add_cascade(label=obtener_texto('menu_file'), menu=menu_archivo)
         
-        #Menú Consultas
+        #Menú Gráficos
         menu_consultas = Menu(barra_menu, tearoff=0)
-        menu_consultas.add_command(label=obtener_texto('menu_generate_queries'), command=lambda: validar_bd(self))
         menu_consultas.add_command(label=obtener_texto('menu_query_assistant'), command=self.mostrar_asistente)
-        menu_consultas.add_separator()
         menu_consultas.add_command(label="Exportar Gráfico a PDF", command=exportar_pdf)
         barra_menu.add_cascade(label=obtener_texto('menu_queries'), menu=menu_consultas)
         
@@ -175,15 +171,18 @@ class InterfazApp:
         menu_ayuda.add_separator()
         menu_ayuda.add_command(label=obtener_texto('menu_exit'), command=self.root.quit)
         self.root.config(menu=barra_menu)
-    
+
+    def mostrar_asistente(self):
+        self.notebook.select(self.frame_graficos)
+        abrir_wizard(self.frame_graficos)
+        
     def crear_accesos_directos(self):
         self.shortcut_bar = Frame(self.root, height=30, bg='#ddd')
         self.shortcut_bar.pack(fill='x')
         ttk.Button(self.shortcut_bar, text=obtener_texto('menu_import_db'), command=lambda: file.cargar_base(self.left_panel, self.menu_import)).pack(side='left', padx=5)
+        ttk.Button(self.shortcut_bar, text=obtener_texto('menu_query_assistant'), command=lambda:self.mostrar_asistente).pack(side='left', padx=5)
     
-    def mostrar_asistente(self):
-        self.notebook.select(self.frame_graficos)
-        abrir_wizard(self.frame_graficos)
+   
     
     def mostrar_acerca_de(self):
         messagebox.showinfo("Acerca de", "OpenDataLite\nVersión 1.0\n© 2025")
