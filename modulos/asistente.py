@@ -5,6 +5,7 @@ from tkinter import ttk, filedialog, messagebox
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from modulos.graficos import exportar_grafico_pdf
+from PIL import Image, ImageTk
 import os
 import modulos.variable as var  # Para almacenar la base de datos seleccionada
 
@@ -198,7 +199,19 @@ def abrir_wizard(frame_graficos):
     tabla = tk.StringVar()
     columna_x = tk.StringVar()
     columna_y = tk.StringVar()
+    # Al inicio de abrir_wizard, justo después de crear tipo_grafico
     tipo_grafico = tk.StringVar(value="Barras")
+
+    def cargar_imagen(nombre_archivo):
+        ruta_script = os.path.dirname(os.path.abspath(__file__))
+        ruta_imagen = os.path.join(ruta_script, "..", "img", nombre_archivo)  # asegúrate de la ruta correcta
+        imagen = Image.open(ruta_imagen).resize((48, 48), Image.LANCZOS)
+        return ImageTk.PhotoImage(imagen)
+
+    # Cargar imágenes
+    img_barras = cargar_imagen("barras.png")
+    img_lineas = cargar_imagen("lineas.png")
+    img_pastel = cargar_imagen("pastel.png")
 
     # Contenedor principal
     contenedor = ttk.Frame(frame_graficos, padding=10)
@@ -262,8 +275,23 @@ def abrir_wizard(frame_graficos):
     columnas_y_combo.grid(row=7, column=0, sticky="ew", pady=2)
 
     ttk.Label(formulario_interior, text="Tipo de gráfico:").grid(row=8, column=0, sticky="w", pady=(10,2))
-    tipo_grafico_combo = ttk.Combobox(formulario_interior, textvariable=tipo_grafico, values=["Barras", "Líneas", "Pastel"], state="readonly")
-    tipo_grafico_combo.grid(row=9, column=0, sticky="ew", pady=2)
+
+    tipo_grafico_frame = ttk.Frame(formulario_interior)
+    tipo_grafico_frame.grid(row=9, column=0, pady=5, sticky="ew")
+
+    # Crear botones de imagen
+    btn_barras = tk.Button(tipo_grafico_frame, image=img_barras, command=lambda: tipo_grafico.set("Barras"))
+    btn_barras.image = img_barras 
+    btn_barras.pack(side="left", padx=5)
+
+    btn_lineas = tk.Button(tipo_grafico_frame, image=img_lineas, command=lambda: tipo_grafico.set("Líneas"))
+    btn_lineas.image = img_lineas
+    btn_lineas.pack(side="left", padx=5)
+
+    btn_pastel = tk.Button(tipo_grafico_frame, image=img_pastel, command=lambda: tipo_grafico.set("Pastel"))
+    btn_pastel.image = img_pastel
+    btn_pastel.pack(side="left", padx=5)
+
 
     volver_btn = ttk.Button(formulario_interior, text="← Volver", command=lambda: volver(frame_graficos))
     volver_btn.grid(row=10, column=0, pady=15)

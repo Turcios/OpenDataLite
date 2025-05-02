@@ -11,6 +11,9 @@ En este proyecto, se desarrollará una aplicación de escritorio de código abie
 
  pip install matplotlib
 
+ # Instalar pillow
+ pip install pillow
+
  # Otras que se pueden utilizar
  pip install reportlab
  

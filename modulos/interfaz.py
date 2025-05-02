@@ -1,8 +1,9 @@
 import tkinter as tk 
-from tkinter import Menu, messagebox, Frame, Label, Listbox, Text, ttk, Scrollbar
+from tkinter import Menu, Frame,  Toplevel, Label, Listbox, Text, ttk, Scrollbar
 from modulos.base_datos import validar_bd
 from modulos.idioma import obtener_texto, cambiar_idioma
 from modulos.asistente import abrir_wizard, exportar_pdf
+from PIL import Image, ImageTk
 import modulos.file as file
 import modulos.base_datos as base_datos
 import modulos.variable as var
@@ -11,7 +12,9 @@ import modulos.variable as var
 def iniciar_interface():
     root = tk.Tk()
     root.title("OpenDataLite")
-    root.geometry("1000x600")
+    root.geometry("1000x600") 
+    # Agregar el icono de OpenDataLite
+    root.iconbitmap("logo.ico")
     app = InterfazApp(root)
     root.mainloop()
 
@@ -182,11 +185,37 @@ class InterfazApp:
         ttk.Button(self.shortcut_bar, text=obtener_texto('menu_import_db'), command=lambda: file.cargar_base(self.left_panel, self.menu_import)).pack(side='left', padx=5)
         ttk.Button(self.shortcut_bar, text=obtener_texto('menu_query_assistant'), command=lambda:self.mostrar_asistente).pack(side='left', padx=5)
     
-   
-    
     def mostrar_acerca_de(self):
-        messagebox.showinfo("Acerca de", "OpenDataLite\nVersión 1.0\n© 2025")
+        self.ventana = Toplevel()
+        self.ventana.title("Acerca de OpenDataLite")
+        self.ventana.geometry("400x500")
+        self.ventana.resizable(False, False)
 
+        # Logo
+        imagen_original = Image.open("logo1.jpg")
+        imagen_redimensionada = imagen_original.resize((100, 100), Image.Resampling.LANCZOS)
+        logo = ImageTk.PhotoImage(imagen_redimensionada)
+
+        logo_label = Label(self.ventana, image=logo)
+        logo_label.image = logo  # Referencia para evitar que la imagen se borre
+        logo_label.pack(pady=(30, 10))
+
+        # Texto del "Acerca de"
+        texto = (
+            "Proyecto de Licenciatura:\n"
+            "OpenDataLite\n\n"
+            "Por:\n"
+            "Viviana López Turcios\n"
+            "Keren Loáiciga Fallas\n\n"
+            "Versión 1.0\n"
+            "© 2025"
+        )
+        texto_label = Label(self.ventana, text=texto, font=("Segoe UI", 20), justify="center")
+        texto_label.pack(padx=20, pady=10)
+
+        # Botón de cerrar
+        cerrar_btn = tk.Button(self.ventana, text="Cerrar", command=self.ventana.destroy)
+        cerrar_btn.pack(pady=(20, 10))
 def actualizar_textos(app):
     # Actualiza los textos del menú al cambiar de idioma.
     app.crear_menu()
