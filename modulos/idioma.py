@@ -22,7 +22,23 @@ IDIOMAS = {
         'execute':'Ejecutar',
         'table_db':'Tabla en la base de datos',
         'charts':'Gráficos',
-        'visualizing_charts':'Visualización de Gráficos'
+        'visualizing_charts':'Visualización de Gráficos',
+        'sucess':'Éxito','select_db_title': 'Seleccionar base de datos',
+        'warning': 'Advertencia',
+        'warning_no_db_selected': 'No se seleccionó ninguna base de datos.',
+        'error_title': 'Error',
+        'error_no_db': 'No hay una base de datos cargada',
+        'query_empty': 'La consulta SQL está vacía',
+        'query_success': 'Consulta ejecutada exitosamente.',
+        'no_results': 'No se encontró resultado de la consulta',
+        'loading_title': 'Cargando',
+        'executing_query': 'Ejecutando consulta, por favor espere...',
+        'sql_error': 'Error de SQL',
+        'sql_query_error': 'Error en la consulta SQL',
+        'export_success': 'Consulta exportada correctamente.',
+        'no_valid_query': 'No hay consulta válida para exportar.',
+        'no_export_data': 'No hay resultados para exportar.',
+        'index': 'Índice'
     },
     'en': {
         'menu_file': 'File',
@@ -47,7 +63,24 @@ IDIOMAS = {
         'execute':'Execute',
         'table_db':'Tables in the database',
         'charts':'Charts',
-        'visualizing_charts':'Visualizing Charts'
+        'visualizing_charts':'Visualizing Charts',
+        'sucess':'Éxito',
+        'select_db_title': 'Select Database',
+        'warning_title': 'Warning',
+        'warning_no_db_selected': 'No database was selected.',
+        'error_title': 'Error',
+        'error_no_db': 'There is no database currently loaded.',
+        'query_empty': 'The SQL query is empty.',
+        'query_success': 'Query executed successfully.',
+        'no_results': 'No results found from the query.',
+        'loading_title': 'Loading',
+        'executing_query': 'Executing query, please wait...',
+        'sql_error': 'SQL Error',
+        'sql_query_error': 'An error occurred in the SQL query',
+        'export_success': 'Query exported successfully.',
+        'no_valid_query': 'There is no valid query to export.',
+        'no_export_data': 'There are no results to export.',
+        'index': 'Index'
     }
 } 
 

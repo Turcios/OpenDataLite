@@ -3,87 +3,72 @@ import sqlite3
 import tkinter as tk
 from tkinter import END, filedialog, messagebox
 import modulos.variable as var
-
+from modulos.idioma import obtener_texto  # Asegúrate de importar esto
 
 def conectar_bd(nombre_bd):
-    """Conecta a una base de datos SQLite."""
     return sqlite3.connect(nombre_bd)
 
-# modulos/base_datos.py
 def seleccionar_bd():
-    # Abrir un cuadro de diálogo para seleccionar la base de datos
     ruta_bd = filedialog.askopenfilename(
-        title="Seleccionar base de datos",
+        title=obtener_texto("select_db_title"),
         filetypes=[("Archivos SQLite", "*.db")]
     )
     
     if ruta_bd:
-        return ruta_bd  # Retorna la ruta de la base de datos seleccionada
+        return ruta_bd
     else:
-        messagebox.showwarning("Advertencia", "No se seleccionó ninguna base de datos.")
+        messagebox.showwarning(obtener_texto("warning_title"), obtener_texto("warning_no_db_selected"))
         return None
-       
+
 def ejecutar_consulta(sentencia_sql, nombre_bd):
-    """Ejecuta una consulta SQL en la base de datos seleccionada y devuelve los resultados."""
     try:
         with sqlite3.connect(nombre_bd) as conexion:
             cursor = conexion.cursor()
             cursor.execute(sentencia_sql)
-            columnas = [desc[0] for desc in cursor.description]  # Obtener nombres de columnas
-            filas = cursor.fetchall()  # Obtener todas las filas de la consulta
+            columnas = [desc[0] for desc in cursor.description]
+            filas = cursor.fetchall()
             return columnas, filas
     except sqlite3.OperationalError as e:
-        messagebox.showerror("Error de SQL", f"Error en la consulta SQL:\n{e}")
+        messagebox.showerror(obtener_texto("sql_error"), f"{obtener_texto('sql_query_error')}:\n{e}")
         return None, None
 
-
 def mostrar_resultados(treeview, columnas, filas):
-    """Muestra los resultados de una consulta SQL en un Treeview."""
-    # Limpiar el Treeview antes de poblarlo con nuevos datos
     for item in treeview.get_children():
         treeview.delete(item)
 
     if not columnas:
-        return  # No hay resultados
+        return
 
-    # Configurar las columnas del Treeview
-    treeview["columns"] = ["Indice"] + columnas  # Añadir columna para el índice
-    treeview["show"] = "headings"  # Mostrar encabezados de columnas
+    treeview["columns"] = ["Indice"] + columnas
+    treeview["show"] = "headings"
     
-    # Configurar encabezados de columna en el Treeview
-    treeview.heading("Indice", text="Índice")  # Encabezado para el índice
-    treeview.column("Indice", width=40, anchor='center')  # Ajuste de ancho para el índice
+    treeview.heading("Indice", text=obtener_texto("index"))
+    treeview.column("Indice", width=40, anchor='center')
     
     for col in columnas:
         treeview.heading(col, text=col)
-        treeview.column(col, width=150, anchor='center')  # Ajuste de ancho para cada columna
+        treeview.column(col, width=150, anchor='center')
 
-    # Insertar filas en el Treeview con índice
     for idx, fila in enumerate(filas, start=1):
-        treeview.insert("", "end", values=(idx,) + fila)  # Insertar índice + fila
+        treeview.insert("", "end", values=(idx,) + fila)
 
-    # Muestra un mensaje de éxito
-    messagebox.showinfo("Éxito", "Consulta ejecutada exitosamente.")
-
+    messagebox.showinfo(obtener_texto("sucess"), obtener_texto("query_success"))
 
 def ejecutar_sql(query_entry, treeview, nombre_bd, root):
-    """Ejecuta la consulta SQL y muestra los resultados en result_text y en el Treeview."""
     sentencia_sql = query_entry.get("1.0", END).strip()
     if not sentencia_sql:
-        messagebox.showwarning("Entrada vacía", "Por favor ingresa una sentencia SQL.")
+        messagebox.showwarning(obtener_texto("warning_title"), obtener_texto("query_empty"))
         return
 
     if not nombre_bd:
-        messagebox.showerror("Error", "No hay una base de datos cargada actualmente.")
+        messagebox.showerror(obtener_texto("error_title"), obtener_texto("error_no_db"))
         return
 
     try:
-        # Crear ventana de carga
         loading_message = tk.Toplevel(root)
-        loading_message.title("Cargando")
+        loading_message.title(obtener_texto("loading_title"))
         loading_message.geometry("300x100")
         
-        # Centrar ventana de carga
         root.update_idletasks()
         x = root.winfo_x() + (root.winfo_width() // 2 - 150)
         y = root.winfo_y() + (root.winfo_height() // 2 - 50)
@@ -92,21 +77,19 @@ def ejecutar_sql(query_entry, treeview, nombre_bd, root):
         loading_message.transient(root)
         loading_message.grab_set()
         
-        tk.Label(loading_message, text="Ejecutando consulta, por favor espere...").pack(expand=True)
+        tk.Label(loading_message, text=obtener_texto("executing_query")).pack(expand=True)
         loading_message.update()
+        
         columnas, filas = ejecutar_consulta(sentencia_sql, nombre_bd)
 
-        # Limpiar antes de mostrar nuevos resultados
         for item in treeview.get_children():
             treeview.delete(item)
 
         if columnas and filas:
-
-            # Mostrar en Treeview
             treeview["columns"] = ["Índice"] + columnas
             treeview["show"] = "headings"
 
-            treeview.heading("Índice", text="Índice")
+            treeview.heading("Índice", text=obtener_texto("index"))
             treeview.column("Índice", width=40, anchor='center')
 
             for col in columnas:
@@ -116,35 +99,30 @@ def ejecutar_sql(query_entry, treeview, nombre_bd, root):
             for idx, fila in enumerate(filas, start=1):
                 treeview.insert("", "end", values=(idx,) + fila)
 
-            messagebox.showinfo("Éxito", "Consulta ejecutada exitosamente.")
+            messagebox.showinfo(obtener_texto("sucess"), obtener_texto("query_success"))
         else:
-            messagebox.showinfo("Éxito", "No se encontró resultado de la consulta")
+            messagebox.showinfo(obtener_texto("sucess"), obtener_texto("no_results"))
     except Exception as e:
-        messagebox.showerror("Error de SQL", f"Error en la consulta SQL:\n{e}")
+        messagebox.showerror(obtener_texto("sql_error"), f"{obtener_texto('sql_query_error')}:\n{e}")
     finally:
         loading_message.destroy()
 
-
 def validar_bd(self):
-    """Ejecuta la consulta y muestra los resultados en una tabla en lugar del cuadro de texto."""
     if not hasattr(var, 'nombre_bd') or not var.nombre_bd:
-        messagebox.showerror("Error", "No hay una base de datos cargada")
+        messagebox.showerror(obtener_texto("error_title"), obtener_texto("error_no_db"))
         return
 
     query = self.query_entry.get("1.0", tk.END).strip()
     if not query:
-        messagebox.showwarning("Advertencia", "La consulta SQL está vacía")
+        messagebox.showwarning(obtener_texto("warning_title"), obtener_texto("query_empty"))
         return 
 
     columnas, resultados = ejecutar_consulta(query, var.nombre_bd)
-    
     mostrar_resultados(self, columnas, resultados)
 
 def exportar_consulta(query_entry):
-    """Guarda el contenido del query_entry en un archivo de texto, excluyendo comentarios."""
     consulta = query_entry.get("1.0", "end").strip()
 
-    # Filtrar líneas que no empiezan con comentarios '--'
     lineas_validas = [
         linea for linea in consulta.splitlines()
         if not linea.strip().startswith('--') and linea.strip() != ''
@@ -152,7 +130,7 @@ def exportar_consulta(query_entry):
     consulta_sin_comentarios = "\n".join(lineas_validas)
 
     if not consulta_sin_comentarios:
-        messagebox.showwarning("Advertencia", "No hay consulta válida para exportar.")
+        messagebox.showwarning(obtener_texto("warning_title"), obtener_texto("no_valid_query"))
         return
 
     file_path = filedialog.asksaveasfilename(
@@ -163,33 +141,27 @@ def exportar_consulta(query_entry):
     if file_path:
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(consulta_sin_comentarios)
-        messagebox.showinfo("Éxito", "Consulta exportada correctamente.")
-        
+        messagebox.showinfo(obtener_texto("sucess"), obtener_texto("export_success"))
+
 def exportar_resultados_csv(self):
-    """Exporta los resultados del Treeview a un archivo CSV."""
-    # Obtener columnas
     columnas = [self.treeview.heading(col)["text"] for col in self.treeview["columns"]]
 
-    # Obtener datos
     filas = []
     for item in self.treeview.get_children():
         fila = self.treeview.item(item)["values"]
         filas.append(fila)
 
     if not filas:
-        messagebox.showwarning("Advertencia", "No hay resultados para exportar.")
+        messagebox.showwarning(obtener_texto("warning_title"), obtener_texto("no_export_data"))
         return
 
-    # Pedir ubicación de guardado
     file_path = filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("CSV files", "*.csv")])
     if not file_path:
         return
 
-    # Escribir archivo CSV
     with open(file_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
-        writer.writerow(columnas)  # Escribir encabezados
-        writer.writerows(filas)    # Escribir datos
+        writer.writerow(columnas)
+        writer.writerows(filas)
 
-    messagebox.showinfo("Éxito", "Resultados exportados correctamente.")
-
+    messagebox.showinfo(obtener_texto("sucess"), obtener_texto("export_success"))
