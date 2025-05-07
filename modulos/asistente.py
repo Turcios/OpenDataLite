@@ -116,7 +116,7 @@ def generar_grafico(tablas_combo, columnas_x_combo, columnas_y_combo, tipo_grafi
     global df_actual
     
 
-    if not all([var.nombre_bd, tablas_combo.get(), columnas_x_combo.get(), columnas_y_combo.get()]):
+    if not all([var.nombre_bd, tablas_combo.get(), columnas_y_combo.get()]):
         messagebox.showwarning("Advertencia", "Selecciona tabla y columnas.")
         return
 
@@ -127,15 +127,19 @@ def generar_grafico(tablas_combo, columnas_x_combo, columnas_y_combo, tipo_grafi
         messagebox.showerror("Error", f"Error leyendo la tabla: {e}")
         return
 
-    if df.empty or columnas_x_combo.get() not in df or columnas_y_combo.get() not in df:
+    if df.empty or columnas_y_combo.get() not in df:
         messagebox.showwarning("Advertencia", "Datos insuficientes para graficar.")
         return
 
-    if not pd.api.types.is_numeric_dtype(df[columnas_y_combo.get()]):
-        messagebox.showerror("Error", f"La columna '{columnas_y_combo.get()}' no es numérica.")
-        return
-
-    df[columnas_x_combo.get()] = df[columnas_x_combo.get()].astype(str)
+    if tipo_grafico.get() == "Histograma":
+        if not pd.api.types.is_numeric_dtype(df[columnas_y_combo.get()]):
+            messagebox.showerror("Error", f"La columna '{columnas_y_combo.get()}' no es numérica.")
+            return
+    else:
+        if columnas_x_combo.get() not in df:
+            messagebox.showwarning("Advertencia", "Datos insuficientes para graficar.")
+            return
+        df[columnas_x_combo.get()] = df[columnas_x_combo.get()].astype(str)
 
     # Limpiar gráficos anteriores
     for widget in frame_grafico.winfo_children():
@@ -143,24 +147,32 @@ def generar_grafico(tablas_combo, columnas_x_combo, columnas_y_combo, tipo_grafi
 
     # Crear nuevo gráfico
     fig, ax = plt.subplots(figsize=(8, 3.5))
-    agrupado = df.groupby(columnas_x_combo.get())[columnas_y_combo.get()].sum()
+    #agrupado = df.groupby(columnas_x_combo.get())[columnas_y_combo.get()].sum()
     
     try:
         if tipo_grafico.get() == "Barras":
+            agrupado = df.groupby(columnas_x_combo.get())[columnas_y_combo.get()].sum()
             agrupado.plot(kind="bar", ax=ax)
         elif tipo_grafico.get() == "Líneas":
+            agrupado = df.groupby(columnas_x_combo.get())[columnas_y_combo.get()].sum()
             agrupado.plot(kind="line", ax=ax, marker='o')
         elif tipo_grafico.get() == "Pastel":
+            agrupado = df.groupby(columnas_x_combo.get())[columnas_y_combo.get()].sum()
             agrupado.plot(kind="pie", ax=ax, autopct='%1.1f%%')
+        elif tipo_grafico.get() == "Histograma":
+            df[columnas_y_combo.get()].plot(kind="hist", bins=10, ax=ax, edgecolor='black')
     except Exception as e:
         messagebox.showerror("Error", f"Error al generar el gráfico: {e}")
         return
 
-    ax.set_title(f"{tipo_grafico.get()} de {columnas_y_combo.get()} por {columnas_x_combo.get()}")
-    if tipo_grafico.get() != "Pastel":
+    ax.set_title(f"{tipo_grafico.get()} de {columnas_y_combo.get()}")
+    if tipo_grafico.get() !=  ["Pastel", "Histograma"]:
         ax.set_xlabel(columnas_x_combo.get())
         ax.set_ylabel(columnas_y_combo.get())
         ax.tick_params(axis='x', rotation=45)
+    elif tipo_grafico.get() == "Histograma":
+        ax.set_xlabel(columnas_y_combo.get())
+        ax.set_ylabel("Frecuencia")
 
     plt.tight_layout()
     canvas = FigureCanvasTkAgg(fig, master=frame_grafico)
@@ -217,6 +229,7 @@ def abrir_wizard(frame_graficos):
     img_barras = cargar_imagen("barras.png")
     img_lineas = cargar_imagen("lineas.png")
     img_pastel = cargar_imagen("pastel.png")
+    img_histograma = cargar_imagen("histogram.png")
 
     # Contenedor principal
     contenedor = ttk.Frame(frame_graficos, padding=10)
@@ -296,6 +309,10 @@ def abrir_wizard(frame_graficos):
     btn_pastel = tk.Button(tipo_grafico_frame, image=img_pastel, command=lambda: tipo_grafico.set("Pastel"))
     btn_pastel.image = img_pastel
     btn_pastel.pack(side="left", padx=5)
+    
+    btn_histograma = tk.Button(tipo_grafico_frame, image=img_histograma, command=lambda: tipo_grafico.set("Histograma"))
+    btn_histograma.image = img_histograma
+    btn_histograma.pack(side="left", padx=5)
 
 
     volver_btn = ttk.Button(formulario_interior, text="← Volver", command=lambda: volver(frame_graficos))
