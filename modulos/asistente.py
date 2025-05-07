@@ -4,13 +4,21 @@ import pandas as pd
 from tkinter import ttk, filedialog, messagebox
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.backends.backend_pdf import PdfPages
 from modulos.graficos import exportar_grafico_pdf
 from PIL import Image, ImageTk
 import os
 import modulos.variable as var  # Para almacenar la base de datos seleccionada
+import numpy as np
+from io import BytesIO
+from datetime import datetime
+
 
 # Contexto global para almacenar el nombre de la base de datos seleccionada
 db_context = {"nombre_bd": None}
+
+fig_actual = None
+df_actual = None
 
 
 def buscar_bases_datos():
@@ -105,12 +113,16 @@ def cargar_columnas(tablas_combo, columnas_x_combo, columnas_y_combo,vista):
 def generar_grafico(tablas_combo, columnas_x_combo, columnas_y_combo, tipo_grafico, frame_grafico, volver_btn):
     """Genera un gráfico basado en la selección del usuario."""
     global fig_actual
+    global df_actual
+    
+
     if not all([var.nombre_bd, tablas_combo.get(), columnas_x_combo.get(), columnas_y_combo.get()]):
         messagebox.showwarning("Advertencia", "Selecciona tabla y columnas.")
         return
 
     try:
         df = pd.read_sql(f"SELECT * FROM '{tablas_combo.get()}'", sqlite3.connect(var.nombre_bd))
+        df_actual = df.copy()
     except Exception as e:
         messagebox.showerror("Error", f"Error leyendo la tabla: {e}")
         return
@@ -164,16 +176,9 @@ def volver(root):
     for widget in root.winfo_children():
         widget.destroy()
     abrir_wizard(root)
-    
-import tkinter as tk
-from tkinter import ttk
 
 def abrir_wizard(frame_graficos):
-    # Variables
-    tabla = tk.StringVar()
-    columna_x = tk.StringVar()
-    columna_y = tk.StringVar()
-    tipo_grafico = tk.StringVar(value="Barras")
+    
 
     # Contenedor principal
     contenedor = ttk.Frame(frame_graficos, padding=10)
@@ -325,13 +330,98 @@ def abrir_wizard(frame_graficos):
     grafico_frame.pack_propagate(False)
 
 
+def crear_pagina_con_encabezado(pdf, contenido_func, *contenido_args):
+    """Crea una página con encabezado y contenido personalizado"""
+    fig, ax = plt.subplots(figsize=(8.5, 11))
+    ax.axis('off')
+
+    # Logo pequeño en la esquina superior izquierda
+    try:
+        logo_img = Image.open("logo1.jpg").resize((40, 40), Image.Resampling.LANCZOS)
+        logo_array = np.array(logo_img)
+
+        # Insertar imagen como parte del eje (usando add_axes evita distorsión)
+        fig.add_axes([0.05, 0.91, 0.08, 0.08]).imshow(logo_array)
+        fig.axes[-1].axis('off')  # Oculta el marco del logo
+    except Exception as e:
+        print(f"No se pudo cargar el logo: {e}")
+
+    # Título centrado arriba
+    fig.text(0.5, 0.95, "OpenDataLite", fontsize=14, ha='center')
+
+    # Fecha a la derecha
+    fecha = datetime.now()
+    fecha_actual = f"{fecha.day}-{fecha.month}-{fecha.year}"
+    fig.text(0.95, 0.95, fecha_actual, fontsize=10, ha='right')
+
+    # Insertar el contenido (gráfico o tabla)
+    contenido_func(fig, *contenido_args)
+
+    # Guardar la página
+    pdf.savefig(fig)
+    plt.close(fig)
+
+
+def insertar_grafico(fig, fig_actual):
+    buf = BytesIO()
+    fig_actual.savefig(buf, format='png', bbox_inches='tight', dpi=150)
+    buf.seek(0)
+    img = Image.open(buf)
+    arr = np.array(img)
+    ax = fig.add_axes([0.05, 0.1, 0.9, 0.8])
+    ax.imshow(arr)
+    ax.axis('off')
+    buf.close()
+
+
+def insertar_tabla(fig, df_page):
+    ax = fig.add_axes([0.1, 0.1, 0.8, 0.75])
+    ax.axis('off')
+    tabla = ax.table(
+        cellText=df_page.values,
+        colLabels=df_page.columns,
+        loc='center',
+        cellLoc='center'
+    )
+    tabla.auto_set_font_size(False)
+    tabla.set_fontsize(10)
+    tabla.scale(1, 1.5)
+
+
 def exportar_pdf():
-        """Exporta el gráfico actual a un archivo PDF."""
-        global fig_actual
-        if 'fig_actual' in globals() and fig_actual is not None:
-            exportar_grafico_pdf(fig_actual)
-        else:
-            messagebox.showwarning("Advertencia", "No hay un gráfico disponible para exportar.")
+    global fig_actual, df_actual
+
+    if fig_actual is None or df_actual is None:
+        messagebox.showwarning("Advertencia", "Debes generar un gráfico primero.")
+        return
+
+    # Elegir dónde guardar el PDF
+    file_path = filedialog.asksaveasfilename(
+        defaultextension=".pdf",
+        filetypes=[("PDF Files", "*.pdf")],
+        title="Guardar reporte como..."
+    )
+    if not file_path:
+        return
+
+    with PdfPages(file_path) as pdf:
+        # Página del gráfico
+        crear_pagina_con_encabezado(pdf, insertar_grafico, fig_actual)
+
+        # Páginas de tabla
+        rows_per_page = 25
+        num_pages = int(np.ceil(len(df_actual) / rows_per_page))
+
+        for page in range(num_pages):
+            start = page * rows_per_page
+            end = start + rows_per_page
+            df_page = df_actual.iloc[start:end]
+            crear_pagina_con_encabezado(pdf, insertar_tabla, df_page)
+
+    messagebox.showinfo("Éxito", f"PDF exportado correctamente:\n{file_path}")
+
+
+           
 
 # Aplicación principal
 if __name__ == "__main__":
