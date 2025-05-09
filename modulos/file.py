@@ -5,7 +5,6 @@ import sqlite3
 import modulos.variable as var
 import csv
 from modulos.idioma import obtener_texto
-from modulos.idioma import obtener_texto
 from PIL import Image, ImageTk
 
 # Contexto para almacenar rutas y configuraciones actuales
