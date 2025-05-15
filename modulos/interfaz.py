@@ -1,3 +1,4 @@
+
 import tkinter as tk 
 from tkinter import Menu, Frame,  Toplevel, Label, Listbox, Text, ttk, Scrollbar
 from modulos.base_datos import validar_bd
@@ -155,7 +156,7 @@ class InterfazApp:
         #Menú Gráficos
         menu_consultas = Menu(barra_menu, tearoff=0)
         menu_consultas.add_command(label=obtener_texto('menu_query_assistant'), command=self.mostrar_asistente)
-        menu_consultas.add_command(label="Exportar Gráfico a PDF", command=exportar_pdf)
+        menu_consultas.add_command(label=obtener_texto('export_chart_PDF'), command=exportar_pdf)
         barra_menu.add_cascade(label=obtener_texto('menu_queries'), menu=menu_consultas)
         
         # Menú Ayuda
@@ -164,10 +165,8 @@ class InterfazApp:
 
         # Submenú de Idioma
         menu_idioma = Menu(menu_ayuda, tearoff=0)
-        menu_idioma.add_command(label=obtener_texto('spanish'),
-                                command=lambda: cambiar_idioma_y_actualizar(self, 'es'))
-        menu_idioma.add_command(label=obtener_texto('english'),
-                                command=lambda: cambiar_idioma_y_actualizar(self, 'en'))
+        menu_idioma.add_command(label=obtener_texto('spanish'),command=lambda: cambiar_idioma_y_actualizar(self, 'es'))
+        menu_idioma.add_command(label=obtener_texto('english'),command=lambda: cambiar_idioma_y_actualizar(self, 'en'))
         menu_ayuda.add_cascade(label=obtener_texto('menu_language'), menu=menu_idioma)
 
         barra_menu.add_cascade(label=obtener_texto('menu_help'), menu=menu_ayuda)
@@ -190,6 +189,7 @@ class InterfazApp:
         self.ventana.title("Acerca de OpenDataLite")
         self.ventana.geometry("400x500")
         self.ventana.resizable(False, False)
+        self.ventana.iconbitmap("logo.ico")
 
         # Logo
         imagen_original = Image.open("logo1.jpg")
@@ -216,12 +216,54 @@ class InterfazApp:
         # Botón de cerrar
         cerrar_btn = tk.Button(self.ventana, text="Cerrar", command=self.ventana.destroy)
         cerrar_btn.pack(pady=(20, 10))
-def actualizar_textos(app):
-    # Actualiza los textos del menú al cambiar de idioma.
-    app.crear_menu()
-    app.crear_accesos_directos()
+
+    def actualizar_textos_interface(self):
+        # Panel izquierdo
+        for widget in self.left_panel.winfo_children():
+            if isinstance(widget, Label):
+                widget.config(text=obtener_texto('table_db'))
+
+        # Texto de pestañas
+        self.notebook.tab(self.frame_consultas, text=obtener_texto('queries'))
+        self.notebook.tab(self.frame_graficos, text=obtener_texto('charts'))
+
+        # Etiquetas y botones de consultas
+        for widget in self.frame_query.winfo_children():
+            if isinstance(widget, Label):
+                widget.config(text=obtener_texto('queries_SQL'))
+        self.boton_ejecutar.config(text=obtener_texto('execute'))
+        self.export_query_button.config(text=obtener_texto('export_query'))  # Asegúrate de tener esta clave en idioma
+
+        # Etiqueta de gráficos
+        for widget in self.frame_graficos.winfo_children():
+            if isinstance(widget, Label):
+                widget.config(text=obtener_texto('visualizing_charts'))
+        self.export_tree_button.config(text=obtener_texto('export_results'))  
+        self.boton_importar.config(text=obtener_texto('menu_import_db'))
+        self.boton_asistente.config(text=obtener_texto('menu_query_assistant'))
+
+        self.crear_menu()
+   
+    def crear_accesos_directos(self):
+        self.shortcut_bar = Frame(self.root, height=30, bg='#ddd')
+        self.shortcut_bar.pack(fill='x')
+
+        self.boton_importar = ttk.Button(
+            self.shortcut_bar,
+            text=obtener_texto('menu_import_db'),
+            command=lambda: file.cargar_base(self.left_panel, self.menu_import)
+        )
+        self.boton_importar.pack(side='left', padx=5)
+
+        self.boton_asistente = ttk.Button(
+            self.shortcut_bar,
+            text=obtener_texto('menu_query_assistant'),
+            command=self.mostrar_asistente  # sin lambda innecesaria
+        )
+        self.boton_asistente.pack(side='left', padx=5)
 
 def cambiar_idioma_y_actualizar(app, idioma):
     # Cambia el idioma y actualiza los textos del menú.
     cambiar_idioma(idioma)
-    actualizar_textos(app)
+	#app.crear_menu()
+    app.actualizar_textos_interface()
