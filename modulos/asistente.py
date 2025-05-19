@@ -110,7 +110,6 @@ def generar_grafico(tablas_combo, columnas_x_combo, columnas_y_combo, tipo_grafi
 
     # Crear nuevo gráfico
     fig, ax = plt.subplots(figsize=(8, 3.5))
-    #agrupado = df.groupby(columnas_x_combo.get())[columnas_y_combo.get()].sum()
     
     try:
         if tipo_grafico.get() == "Barras":

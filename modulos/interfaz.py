@@ -8,14 +8,22 @@ from PIL import Image, ImageTk
 import modulos.file as file
 import modulos.base_datos as base_datos
 import modulos.variable as var
+import os
+import sys
 
+def obtener_ruta_recurso(nombre_archivo):
+    """Retorna la ruta al recurso empaquetado (compatible con PyInstaller)."""
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, nombre_archivo)
+    return os.path.join(os.path.abspath("."), nombre_archivo)
 
 def iniciar_interface():
     root = tk.Tk()
     root.title("OpenDataLite")
     root.geometry("1000x600") 
     # Agregar el icono de OpenDataLite
-    root.iconbitmap("logo.ico")
+    ruta_icono = obtener_ruta_recurso("logo.ico")
+    root.iconbitmap(ruta_icono)
     app = InterfazApp(root)
     root.mainloop()
 
