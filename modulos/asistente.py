@@ -289,7 +289,7 @@ def abrir_wizard(frame_graficos):
     vista_y_boton_frame.rowconfigure(0, weight=1)
 
     vista_frame = ttk.LabelFrame(vista_y_boton_frame, text=obtener_texto("query_preview"), padding=(10,10))
-    vista_frame.grid(row=0, column=0, sticky="nsew")
+    vista_frame.grid(row=0, column=0, sticky="nsew", padx=30, pady=5)
 
     vista_scroll = ttk.Scrollbar(vista_frame)
     vista_scroll.pack(side="right", fill="y")

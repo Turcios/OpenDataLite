@@ -85,7 +85,7 @@ IDIOMAS = {
         'charts': 'Gráficos',
         'queries_SQL': 'Consulta SQL',
         'ejecutar': 'Ejecutar',
-        'visualizing_charts': 'Visualizando Gráficos',
+        'visualizing_charts': 'Visualizando gráficos (método agrupación)',
         'export_query': 'Exportar Consulta',
         'export_results': 'Exportar Resultados',
         'export_chart_PDF':'Exportar Gráfico a PDF'
@@ -176,7 +176,7 @@ IDIOMAS = {
         'charts': 'Charts',
         'queries_SQL': 'SQL Query',
         'execute': 'Execute',
-        'visualizing_charts': 'Visualizing Charts',
+        'visualizing_charts': 'Visualizing Charts(Grouping Method)',
         'export_query': 'Export Query',
         'export_results': 'Export Results',
         'export_chart_PDF':'Export Chart to PDF'
