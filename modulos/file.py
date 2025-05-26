@@ -30,13 +30,13 @@ def select_archivo(tipo_archivo):
             f"{obtener_texto('no_select')} {tipos[tipo_archivo][0].lower()}."
         )
 
-def abrir_nueva_ventana(frame_izquierdo):
+def abrir_nueva_ventana(frame_izquierdo, ruta_archivo, menu):
     nueva_ventana = tk.Toplevel()
     nueva_ventana.title("OpenDataLite")
     nueva_ventana.geometry("600x400+300+200")
     nueva_ventana.transient(nueva_ventana.master)
     nueva_ventana.grab_set()
-    nueva_ventana.iconbitmap("logo.ico")
+    nueva_ventana.iconbitmap(ruta_archivo)
 
     entradas = {
         obtener_texto("bd_name"): tk.Entry(nueva_ventana),
@@ -54,10 +54,10 @@ def abrir_nueva_ventana(frame_izquierdo):
         command=lambda: mostrar_datos(
             entradas[obtener_texto("bd_name")].get(),
             entradas[obtener_texto("table_name")].get(),
-            frame_izquierdo, nueva_ventana)
+            frame_izquierdo, nueva_ventana, menu)
     ).pack(pady=10)
 
-def mostrar_datos(nombre_bd, nombre_tabla, frame_izquierdo, nueva_ventana):
+def mostrar_datos(nombre_bd, nombre_tabla, frame_izquierdo, nueva_ventana,menu):
     if not db_context.get("ruta_csv"):
         messagebox.showerror(obtener_texto("error"), obtener_texto("csv_no_seleccionado"))
         return
@@ -65,8 +65,10 @@ def mostrar_datos(nombre_bd, nombre_tabla, frame_izquierdo, nueva_ventana):
     try:
         df = pd.read_csv(db_context["ruta_csv"], on_bad_lines='skip')
         conexion = sqlite3.connect(nombre_bd + ".db")
-
+        var.menu_importar =1
+        menu.entryconfig(obtener_texto('CSV'), state='normal')
         with open(db_context["ruta_csv"], 'r', encoding='utf-8') as file:
+            var.ruta_bd =file
             sample = file.read(2048)
             dialect = csv.Sniffer().sniff(sample, delimiters="-,/.\t")
             file.seek(0)
@@ -116,15 +118,16 @@ def cargar_base(frame_izquierdo, menu):
             conexion.close()
             mostrar_estructura(var.ruta_bd, frame_izquierdo)
             menu.entryconfig(obtener_texto('CSV'), state='normal')
+            var.menu_importar=1
             messagebox.showinfo(obtener_texto("success"), obtener_texto("bd_loaded"))
         except Exception as e:
             messagebox.showerror(obtener_texto("error"), f"{obtener_texto('error_load_db')}: {e}")
 
-def cargar_csv(frame_izquierdo):
+def cargar_csv(frame_izquierdo, ruta_archivo):
     ventana_carga = tk.Toplevel()
     ventana_carga.title("OpenDataLite")
     ventana_carga.geometry("600x400+300+200")
-    ventana_carga.iconbitmap("logo.ico")
+    ventana_carga.iconbitmap(ruta_archivo)
     ventana_carga.transient(ventana_carga.master)
     ventana_carga.grab_set()
 
@@ -164,10 +167,10 @@ def mostrar_estructura(nombre_bd, frame_izquierdo):
     finally:
         conexion.close()
 
-def nueva_archivo(frame_izquierdo, tipo):
+def nueva_archivo(frame_izquierdo, tipo, ruta_archivo,menu):
     if tipo == 1:
-        cargar_csv(frame_izquierdo)
+        cargar_csv(frame_izquierdo, ruta_archivo)
     elif tipo == 2:
-        abrir_nueva_ventana(frame_izquierdo)
+        abrir_nueva_ventana(frame_izquierdo, ruta_archivo,menu)
 
 

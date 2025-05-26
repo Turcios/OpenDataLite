@@ -5,7 +5,7 @@ Resumen para generar el ejecutable e instalador de OpenDataLite
 
 2. Crear el ejecutable con PyInstaller
 Comando usado:
-    pyinstaller --name OpenDataLite --onefile --windowed --icon=logo.ico --add-data "logo.ico;." main.py 
+    pyinstaller --name OpenDataLite --onefile --windowed --icon=logo.ico --add-data "logo.ico;." --add-data "logo1.jpg;." main.py 
 
 Resultado:
 - Se generó el archivo dist/OpenDataLite.exe.

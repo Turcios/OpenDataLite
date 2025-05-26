@@ -151,12 +151,12 @@ class InterfazApp:
         barra_menu = Menu(self.root)
         # Menú Archivos
         menu_archivo = Menu(barra_menu, tearoff=0)
-        menu_archivo.add_command(label=obtener_texto('new_data_base'), command=lambda: file.nueva_archivo(self.left_panel, 2))
+        menu_archivo.add_command(label=obtener_texto('new_data_base'), command=lambda: file.nueva_archivo(self.left_panel, 2, obtener_ruta_recurso("logo.ico"),menu_import))
         menu_archivo.add_command(label=obtener_texto('menu_import_db'), command=lambda: file.cargar_base(self.left_panel,menu_import))
         menu_archivo.add_separator()
         # Submenú de Archivos
         menu_import = Menu(barra_menu, tearoff=0)
-        menu_import.add_command(label=obtener_texto('CSV'), command=lambda: file.nueva_archivo(self.left_panel, 1), state='disabled') #
+        menu_import.add_command(label=obtener_texto('CSV'), command=lambda: file.nueva_archivo(self.left_panel, 1,obtener_ruta_recurso("logo.ico"),menu_import), state='disabled') #
         menu_archivo.add_cascade(label=obtener_texto('import'), menu=menu_import)
         self.menu_import= menu_import 
         barra_menu.add_cascade(label=obtener_texto('menu_file'), menu=menu_archivo)
@@ -197,10 +197,11 @@ class InterfazApp:
         self.ventana.title("Acerca de OpenDataLite")
         self.ventana.geometry("400x500")
         self.ventana.resizable(False, False)
-        self.ventana.iconbitmap("logo.ico")
+        icono_path = obtener_ruta_recurso("logo.ico")
+        self.ventana.iconbitmap(icono_path)
 
-        # Logo
-        imagen_original = Image.open("logo1.jpg")
+        imagen_path = obtener_ruta_recurso("logo1.jpg")
+        imagen_original = Image.open(imagen_path)
         imagen_redimensionada = imagen_original.resize((100, 100), Image.Resampling.LANCZOS)
         logo = ImageTk.PhotoImage(imagen_redimensionada)
 
