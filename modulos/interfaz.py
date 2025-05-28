@@ -156,7 +156,10 @@ class InterfazApp:
         menu_archivo.add_separator()
         # Submenú de Archivos
         menu_import = Menu(barra_menu, tearoff=0)
-        menu_import.add_command(label=obtener_texto('CSV'), command=lambda: file.nueva_archivo(self.left_panel, 1,obtener_ruta_recurso("logo.ico"),menu_import), state='disabled') #
+        if var.menu_importar == 1:
+            menu_import.add_command(label=obtener_texto('CSV'), command=lambda: file.nueva_archivo(self.left_panel, 1,obtener_ruta_recurso("logo.ico"),menu_import)) #
+        else:
+            menu_import.add_command(label=obtener_texto('CSV'), command=lambda: file.nueva_archivo(self.left_panel, 1,obtener_ruta_recurso("logo.ico"),menu_import), state='disabled') #
         menu_archivo.add_cascade(label=obtener_texto('import'), menu=menu_import)
         self.menu_import= menu_import 
         barra_menu.add_cascade(label=obtener_texto('menu_file'), menu=menu_archivo)
@@ -274,5 +277,4 @@ class InterfazApp:
 def cambiar_idioma_y_actualizar(app, idioma):
     # Cambia el idioma y actualiza los textos del menú.
     cambiar_idioma(idioma)
-	#app.crear_menu()
     app.actualizar_textos_interface()

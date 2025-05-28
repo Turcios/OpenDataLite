@@ -65,10 +65,10 @@ def mostrar_datos(nombre_bd, nombre_tabla, frame_izquierdo, nueva_ventana,menu):
     try:
         df = pd.read_csv(db_context["ruta_csv"], on_bad_lines='skip')
         conexion = sqlite3.connect(nombre_bd + ".db")
+        var.ruta_bd =nombre_bd + ".db"
         var.menu_importar =1
         menu.entryconfig(obtener_texto('CSV'), state='normal')
-        with open(db_context["ruta_csv"], 'r', encoding='utf-8') as file:
-            var.ruta_bd =file
+        with open(db_context["ruta_csv"], 'r', encoding='utf-8') as file:            
             sample = file.read(2048)
             dialect = csv.Sniffer().sniff(sample, delimiters="-,/.\t")
             file.seek(0)
