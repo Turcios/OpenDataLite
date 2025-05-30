@@ -5,7 +5,6 @@ from tkinter import ttk, filedialog, messagebox
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.backends.backend_pdf import PdfPages
-from modulos.graficos import exportar_grafico_pdf
 from PIL import Image, ImageTk
 import os
 import modulos.variable as var
@@ -13,6 +12,7 @@ import numpy as np
 from io import BytesIO
 from datetime import datetime
 from modulos.idioma import obtener_texto
+from modulos.utils import obtener_ruta_recurso
 
 
 # Contexto global para almacenar el nombre de la base de datos seleccionada
@@ -23,7 +23,7 @@ df_actual = None
 
 
 def buscar_bases_datos():
-    """Busca archivos .db en el directorio actual y devuelve una lista de nombres."""
+    #Busca archivos .db en el directorio actual y devuelve una lista de nombres.
     carpeta_busqueda = os.getcwd()  # Puedes cambiarlo si deseas otra ruta específica
     return [f for f in os.listdir(carpeta_busqueda) if f.endswith(".db")]
 
@@ -37,9 +37,9 @@ def obtener_datos_bd(nombre_bd, tabla):
         return None
 
 def cargar_tablas(tablas_combo):
-    """Carga las tablas de la base de datos seleccionada y las muestra en el Dropdown."""
+    #Carga las tablas de la base de datos seleccionada y las muestra en el Dropdown.
     if not var.nombre_bd:
-        messagebox.showwarning(obtener_texto("warning"),obtener_texto("do_not_select_db"))
+        messagebox.showwarning(obtener_texto("warning"),obtener_texto('do_not_select_db'))
         return
     try:
         with sqlite3.connect(var.nombre_bd) as conn:
@@ -48,10 +48,10 @@ def cargar_tablas(tablas_combo):
             if not tablas.empty:
                 tablas_combo.current(0)
     except Exception as e:
-        messagebox.showerror(obtener_texto("error"), f"{obtener_texto("error_load_table")} {e}")
+        messagebox.showerror(obtener_texto("error"), f"{obtener_texto('error_load_table')} {e}")
 
 def cargar_columnas(tablas_combo, columnas_x_combo, columnas_y_combo,vista):
-    """Carga las columnas de la tabla seleccionada y las muestra en los Dropdowns de ejes X e Y."""
+    #Carga las columnas de la tabla seleccionada y las muestra en los Dropdowns de ejes X e Y.
     if not var.nombre_bd or not tablas_combo.get():
         messagebox.showwarning(obtener_texto("warning"), obtener_texto("select_database_table"))
         return
@@ -65,33 +65,33 @@ def cargar_columnas(tablas_combo, columnas_x_combo, columnas_y_combo,vista):
                 columnas_x_combo.current(0)
                 columnas_y_combo.current(1 if len(col_names) > 1 else 0)
 
-            df_preview = pd.read_sql(f"SELECT * FROM '{tablas_combo.get()}' LIMIT 7", conn)
+            df_preview = pd.read_sql(f"SELECT * FROM '{tablas_combo.get()}' LIMIT 10", conn)
             vista.config(state='normal')
             vista.delete("1.0", tk.END)
             vista.insert(tk.END, df_preview.to_string(index=False))
             vista.config(state='disabled')
     except Exception as e:
-        messagebox.showerror(obtener_texto("error"), f"{obtener_texto("no_column_select")} {e}")
+        messagebox.showerror(obtener_texto("error"), f"{obtener_texto('no_column_select')} {e}")
 
 def generar_grafico(tablas_combo, columnas_x_combo, columnas_y_combo, tipo_grafico, frame_grafico, volver_btn):
-    """Genera un gráfico basado en la selección del usuario."""
+    #Genera un gráfico basado en la selección del usuario.
     global fig_actual
     global df_actual
     
 
     if not all([var.nombre_bd, tablas_combo.get(), columnas_y_combo.get()]):
-        messagebox.showwarning(obtener_texto("warning"), obtener_texto("select_table_columns"))
+        messagebox.showwarning(obtener_texto("warning"), obtener_texto('select_table_columns'))
         return
 
     try:
         df = pd.read_sql(f"SELECT * FROM '{tablas_combo.get()}'", sqlite3.connect(var.nombre_bd))
         df_actual = df.copy()
     except Exception as e:
-        messagebox.showerror(obtener_texto("error"), f"{obtener_texto("error_reading_table")}: {e}")
+        messagebox.showerror(obtener_texto("error"), f"{obtener_texto('error_reading_table')}: {e}")
         return
 
     if df.empty or columnas_y_combo.get() not in df:
-        messagebox.showwarning(obtener_texto("warning"),obtener_texto("Insufficient_data_graph"))
+        messagebox.showwarning(obtener_texto("warning"),obtener_texto('Insufficient_data_graph'))
         return
 
     if tipo_grafico.get() == "Histograma":
@@ -100,7 +100,7 @@ def generar_grafico(tablas_combo, columnas_x_combo, columnas_y_combo, tipo_grafi
             return
     else:
         if columnas_x_combo.get() not in df:
-            messagebox.showwarning(obtener_texto("warning"),obtener_texto("Insufficient_data_graph"))
+            messagebox.showwarning(obtener_texto("warning"),obtener_texto('Insufficient_data_graph'))
             return
         df[columnas_x_combo.get()] = df[columnas_x_combo.get()].astype(str)
 
@@ -124,7 +124,7 @@ def generar_grafico(tablas_combo, columnas_x_combo, columnas_y_combo, tipo_grafi
         elif tipo_grafico.get() == "Histograma":
             df[columnas_y_combo.get()].plot(kind="hist", bins=10, ax=ax, edgecolor='black')
     except Exception as e:
-        messagebox.showerror(obtener_texto("error"), f"{obtener_texto("error_generate_chart")} {e}")
+        messagebox.showerror(obtener_texto("error"), f"{obtener_texto('error_generate_chart')} {e}")
         return
 
     ax.set_title(f"{tipo_grafico.get()} de {columnas_y_combo.get()}")
@@ -150,28 +150,19 @@ def volver(root):
     for widget in root.winfo_children():
         widget.destroy()
     abrir_wizard(root)
-
-def abrir_wizard(frame_graficos):
+    
+ 
+def cargar_imagen(nombre_archivo):
+    try:
+        ruta_imagen = obtener_ruta_recurso(nombre_archivo)
+        print(f"Cargando imagen: {ruta_imagen}")
+        imagen = Image.open(ruta_imagen).resize((48, 48), Image.LANCZOS)
+        return ImageTk.PhotoImage(imagen)
+    except Exception as e:
+        print(f"Error cargando {nombre_archivo}: {e}")
+        return None
     
 
-    # Contenedor principal
-    contenedor = ttk.Frame(frame_graficos, padding=10)
-    contenedor.pack(fill="both", expand=True)
-
-    contenedor.columnconfigure(0, weight=1)
-    contenedor.columnconfigure(1, weight=2)
-    contenedor.rowconfigure(0, weight=1)
-
-    # --------- FORMULARIO IZQUIERDA CON SCROLL ----------
-    formulario_canvas = tk.Canvas(contenedor, borderwidth=0, highlightthickness=0)
-    formulario_scrollbar = ttk.Scrollbar(contenedor, orient="vertical", command=formulario_canvas.yview)
-    formulario_canvas.configure(yscrollcommand=formulario_scrollbar.set)
-
-    formulario_canvas.grid(row=0, column=0, sticky="nsew", padx=(0,10), pady=(0,10))
-    formulario_scrollbar.grid(row=0, column=0, sticky="nse", padx=(0,0), pady=(0,10))
-
-    formulario_frame = ttk.LabelFrame(formulario_canvas, text=obtener_texto("configuration"), padding=(15, 10))
-    formulario_canvas.create_window((0, 0), window=formulario_frame, anchor="nw")
 
 def abrir_wizard(frame_graficos):
     # Variables
@@ -181,17 +172,15 @@ def abrir_wizard(frame_graficos):
     # Al inicio de abrir_wizard, justo después de crear tipo_grafico
     tipo_grafico = tk.StringVar(value="Barras")
 
-    def cargar_imagen(nombre_archivo):
-        ruta_script = os.path.dirname(os.path.abspath(__file__))
-        ruta_imagen = os.path.join(ruta_script, "..", "img", nombre_archivo)  # asegúrate de la ruta correcta
-        imagen = Image.open(ruta_imagen).resize((48, 48), Image.LANCZOS)
-        return ImageTk.PhotoImage(imagen)
-
     # Cargar imágenes
     img_barras = cargar_imagen("barras.png")
+    print("Imagen barras cargada")
     img_lineas = cargar_imagen("lineas.png")
+    print("Líneas OK")
     img_pastel = cargar_imagen("pastel.png")
+    print("Pastel OK")
     img_histograma = cargar_imagen("histogram.png")
+    print("histograma OK")
 
     # Contenedor principal
     contenedor = ttk.Frame(frame_graficos, padding=10)
@@ -201,9 +190,9 @@ def abrir_wizard(frame_graficos):
     contenedor.columnconfigure(1, weight=2)
     contenedor.rowconfigure(0, weight=1)
     contenedor.rowconfigure(1, weight=1)
-
+    
     # -------- FORMULARIO CON SCROLLBAR ----------
-    formulario_frame = ttk.LabelFrame(contenedor, text=obtener_texto("configuration"), padding=(0,0))
+    formulario_frame = ttk.LabelFrame(contenedor, text=obtener_texto("configuration"), padding=0)
     formulario_frame.grid(row=0, column=0, sticky="nsew", padx=(0,10), pady=(0,10))
 
     formulario_canvas = tk.Canvas(formulario_frame, borderwidth=0, highlightthickness=0)
@@ -212,28 +201,20 @@ def abrir_wizard(frame_graficos):
     formulario_canvas.pack(side="left", fill="both", expand=True)
 
     formulario_interior = ttk.Frame(formulario_canvas, padding=10)
-    formulario_interior.bind(
-        "<Configure>",
-        lambda e: formulario_canvas.configure(
-            scrollregion=formulario_canvas.bbox("all")
-        )
-    )
-
-    interior_id = formulario_canvas.create_window((0, 0), window=formulario_interior, anchor="nw")
-    formulario_canvas.configure(yscrollcommand=formulario_scrollbar.set)
+    formulario_canvas.create_window((0, 0), window=formulario_interior, anchor="nw")
 
     # Ajustar el ancho del interior al ancho del canvas
     def ajustar_ancho(event):
-        canvas_width = event.width
-        formulario_canvas.itemconfig(interior_id, width=canvas_width)
-
+        formulario_canvas.itemconfig("all", width=event.width)
     formulario_canvas.bind("<Configure>", ajustar_ancho)
 
-    # Para permitir el scroll con la rueda del mouse
-    def _on_mousewheel(event):
-        formulario_canvas.yview_scroll(int(-1*(event.delta/120)), "units")
-
-    formulario_canvas.bind_all("<MouseWheel>", _on_mousewheel)
+    formulario_interior.bind(
+        "<Configure>",
+        lambda e: formulario_canvas.configure(scrollregion=formulario_canvas.bbox("all"))
+    )
+    
+    formulario_canvas.configure(yscrollcommand=formulario_scrollbar.set)
+    formulario_canvas.bind_all("<MouseWheel>", lambda e: formulario_canvas.yview_scroll(int(-1 * (e.delta / 120)), "units"))
 
     # ------- WIDGETS del formulario -------
     formulario_interior.columnconfigure(0, weight=1)
@@ -260,22 +241,16 @@ def abrir_wizard(frame_graficos):
     tipo_grafico_frame.grid(row=9, column=0, pady=5, sticky="ew")
 
     # Crear botones de imagen
-    btn_barras = tk.Button(tipo_grafico_frame, image=img_barras, command=lambda: tipo_grafico.set("Barras"))
-    btn_barras.image = img_barras 
-    btn_barras.pack(side="left", padx=5)
-
-    btn_lineas = tk.Button(tipo_grafico_frame, image=img_lineas, command=lambda: tipo_grafico.set("Líneas"))
-    btn_lineas.image = img_lineas
-    btn_lineas.pack(side="left", padx=5)
-
-    btn_pastel = tk.Button(tipo_grafico_frame, image=img_pastel, command=lambda: tipo_grafico.set("Pastel"))
-    btn_pastel.image = img_pastel
-    btn_pastel.pack(side="left", padx=5)
-    
-    btn_histograma = tk.Button(tipo_grafico_frame, image=img_histograma, command=lambda: tipo_grafico.set("Histograma"))
-    btn_histograma.image = img_histograma
-    btn_histograma.pack(side="left", padx=5)
-
+    for img, tipo in zip(
+        [img_barras, img_lineas, img_pastel, img_histograma],
+        ["Barras", "Líneas", "Pastel", "Histograma"]
+    ):
+        if img:
+            btn = tk.Button(tipo_grafico_frame, image=img, command=lambda t=tipo: tipo_grafico.set(t))
+            btn.image = img
+            btn.pack(side="left", padx=5)
+        else:
+            print(f"Imagen tipo {tipo} no carga. Se omite botón.")
 
     volver_btn = ttk.Button(formulario_interior, text="← Volver", command=lambda: volver(frame_graficos))
     volver_btn.grid(row=10, column=0, pady=15)
@@ -288,7 +263,7 @@ def abrir_wizard(frame_graficos):
     vista_y_boton_frame.columnconfigure(0, weight=1)
     vista_y_boton_frame.rowconfigure(0, weight=1)
 
-    vista_frame = ttk.LabelFrame(vista_y_boton_frame, text=obtener_texto("query_preview"), padding=(10,10))
+    vista_frame = ttk.LabelFrame(vista_y_boton_frame, text=obtener_texto("query_preview"), padding=10)
     vista_frame.grid(row=0, column=0, sticky="nsew", padx=30, pady=5)
 
     vista_scroll = ttk.Scrollbar(vista_frame)
@@ -310,7 +285,7 @@ def abrir_wizard(frame_graficos):
 
 
 def crear_pagina_con_encabezado(pdf, contenido_func, *contenido_args):
-    """Crea una página con encabezado y contenido personalizado"""
+    #Crea una página con encabezado y contenido personalizado
     fig, ax = plt.subplots(figsize=(8.5, 11))
     ax.axis('off')
 
@@ -397,7 +372,7 @@ def exportar_pdf():
             df_page = df_actual.iloc[start:end]
             crear_pagina_con_encabezado(pdf, insertar_tabla, df_page)
 
-    messagebox.showinfo(obtener_texto("success"), f"{obtener_texto("success_pdf")}:\n{file_path}")
+    messagebox.showinfo(obtener_texto("success"), f"{obtener_texto('success_pdf')}:\n{file_path}")
 
 
            
@@ -409,5 +384,5 @@ if __name__ == "__main__":
     root.geometry("900x600")
 
     abrir_wizard(root)
-
+    
     root.mainloop()
