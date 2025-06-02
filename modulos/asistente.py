@@ -291,7 +291,8 @@ def crear_pagina_con_encabezado(pdf, contenido_func, *contenido_args):
 
     # Logo pequeño en la esquina superior izquierda
     try:
-        logo_img = Image.open("logo1.jpg").resize((40, 40), Image.Resampling.LANCZOS)
+        logo_img = obtener_ruta_recurso("logo1.jpg")
+        logo_img = Image.open(logo_img).resize((40, 40), Image.Resampling.LANCZOS)
         logo_array = np.array(logo_img)
 
         # Insertar imagen como parte del eje (usando add_axes evita distorsión)
