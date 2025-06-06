@@ -52,9 +52,9 @@ def mostrar_resultados(treeview, columnas, filas):
     for idx, fila in enumerate(filas, start=1):
         treeview.insert("", "end", values=(idx,) + fila)
 
-    messagebox.showinfo(obtener_texto("sucess"), obtener_texto("query_success"))
+    messagebox.showinfo(obtener_texto("success"), obtener_texto("query_success"))
 
-def ejecutar_sql(query_entry, treeview, nombre_bd, root):
+def ejecutar_sql(query_entry, treeview, nombre_bd, root, ruta_archivo):
     sentencia_sql = query_entry.get("1.0", END).strip()
     if not sentencia_sql:
         messagebox.showwarning(obtener_texto("warning_title"), obtener_texto("query_empty"))
@@ -73,7 +73,8 @@ def ejecutar_sql(query_entry, treeview, nombre_bd, root):
         x = root.winfo_x() + (root.winfo_width() // 2 - 150)
         y = root.winfo_y() + (root.winfo_height() // 2 - 50)
         loading_message.geometry(f"300x100+{x}+{y}")
-        
+        loading_message.grab_set()
+        loading_message.iconbitmap(ruta_archivo)
         loading_message.transient(root)
         loading_message.grab_set()
         
@@ -99,9 +100,9 @@ def ejecutar_sql(query_entry, treeview, nombre_bd, root):
             for idx, fila in enumerate(filas, start=1):
                 treeview.insert("", "end", values=(idx,) + fila)
 
-            messagebox.showinfo(obtener_texto("sucess"), obtener_texto("query_success"))
+            messagebox.showinfo(obtener_texto("success"), obtener_texto("query_success"))
         else:
-            messagebox.showinfo(obtener_texto("sucess"), obtener_texto("no_results"))
+            messagebox.showinfo(obtener_texto("success"), obtener_texto("no_results"))
     except Exception as e:
         messagebox.showerror(obtener_texto("sql_error"), f"{obtener_texto('sql_query_error')}:\n{e}")
     finally:
@@ -141,7 +142,7 @@ def exportar_consulta(query_entry):
     if file_path:
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(consulta_sin_comentarios)
-        messagebox.showinfo(obtener_texto("sucess"), obtener_texto("export_success"))
+        messagebox.showinfo(obtener_texto("success"), obtener_texto("export_success"))
 
 def exportar_resultados_csv(self):
     columnas = [self.treeview.heading(col)["text"] for col in self.treeview["columns"]]
@@ -164,4 +165,4 @@ def exportar_resultados_csv(self):
         writer.writerow(columnas)
         writer.writerows(filas)
 
-    messagebox.showinfo(obtener_texto("sucess"), obtener_texto("export_success"))
+    messagebox.showinfo(obtener_texto("success"), obtener_texto("export_success"))
