@@ -151,7 +151,7 @@ def mostrar_estructura(nombre_bd, frame_izquierdo):
 
     treeview = ttk.Treeview(frame_izquierdo)
     treeview.pack(expand=True, fill="both", padx=10, pady=10)
-    treeview.heading("#0", text=obtener_texto("table"), anchor="w")
+    treeview.heading("#0", text=obtener_texto("tables"), anchor="w")
 
     try:
         var.nombre_bd = nombre_bd

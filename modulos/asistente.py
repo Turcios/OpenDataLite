@@ -221,7 +221,7 @@ def abrir_wizard(frame_graficos):
 
     ttk.Button(formulario_interior, text=obtener_texto("load_tables"), command=lambda: cargar_tablas(tablas_combo)).grid(row=0, column=0, sticky="ew", pady=5)
 
-    ttk.Label(formulario_interior, text="Tabla:").grid(row=1, column=0, sticky="w", pady=(10,2))
+    ttk.Label(formulario_interior, text=obtener_texto("table")).grid(row=1, column=0, sticky="w", pady=(10,2))
     tablas_combo = ttk.Combobox(formulario_interior, textvariable=tabla, state="readonly")
     tablas_combo.grid(row=2, column=0, sticky="ew", pady=2)
 

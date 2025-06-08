@@ -1,5 +1,6 @@
 IDIOMAS = {
     'es': {
+        'table': 'Tabla:',
         'menu_file': 'Archivo',
         'menu_import': 'Importar',
         'menu_import_db': 'Abrir base de datos',
@@ -54,7 +55,7 @@ IDIOMAS = {
         'bd_loaded': 'Base de datos cargada correctamente',
         'error_load_db': 'Error al cargar la base de datos',
         'structure': 'Estructura:',
-        'table': 'Tablas',
+        'tables': 'Tablas',
         'select_database': 'Seleccionar base de datos',
         'select_a_database': 'Seleccionar una base de datos:',
         'confirm': 'Confirmar',
@@ -91,6 +92,7 @@ IDIOMAS = {
         'export_chart_PDF':'Exportar Gráfico a PDF'
     },
     'en': {
+        'table': 'Table:',
         'menu_file': 'File',
         'menu_import': 'Import',
         'menu_import_db': 'Open database',
@@ -145,7 +147,7 @@ IDIOMAS = {
         'bd_loaded': 'Database loaded successfully.',
         'error_load_db': 'Error loading database',
         'structure': 'Structure:',
-        'table': 'Tables',
+        'tables': 'Tables',
         'select_database': 'Select database',
         'select_a_database': 'Select a database:',
         'confirm': 'Confirm',

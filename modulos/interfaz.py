@@ -76,7 +76,7 @@ class InterfazApp:
         # Exportar y ejecutar consulta
         self.boton_ejecutar = ttk.Button(self.frame_query, text=obtener_texto('execute'), command=lambda: base_datos.ejecutar_sql(self.query_entry, self.treeview, var.nombre_bd, self.root,obtener_ruta_recurso("logo.ico")))
         self.boton_ejecutar.pack(side="right", padx=10, pady=5) 
-        self.export_query_button = ttk.Button(self.frame_query, text="Exportar Consulta", command=lambda:base_datos.exportar_consulta(self.query_entry))
+        self.export_query_button = ttk.Button(self.frame_query, text=obtener_texto('export_query'), command=lambda:base_datos.exportar_consulta(self.query_entry))
         self.export_query_button.pack(side="right", padx=10, pady=5)
          
         # Frame para resultados (Treeview, parte inferior)

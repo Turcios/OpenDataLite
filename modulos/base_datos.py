@@ -156,7 +156,7 @@ def exportar_resultados_csv(self):
         messagebox.showwarning(obtener_texto("warning_title"), obtener_texto("no_export_data"))
         return
 
-    file_path = filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("CSV files", "*.csv")])
+    file_path = filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("CSV files", "*.csv"),   ("Text files", "*.txt")])
     if not file_path:
         return
 
