@@ -14,7 +14,6 @@ from datetime import datetime
 from modulos.idioma import obtener_texto
 from modulos.utils import obtener_ruta_recurso
 import threading
-import matplotlib
 
 # Contexto global para almacenar el nombre de la base de datos seleccionada
 db_context = {"nombre_bd": None}
@@ -65,10 +64,15 @@ def cargar_columnas(tablas_combo, columnas_x_combo, columnas_y_combo,vista):
             if col_names:
                 columnas_x_combo.current(0)
                 columnas_y_combo.current(1 if len(col_names) > 1 else 0)
-
-            df_preview = pd.read_sql(f"SELECT * FROM '{tablas_combo.get()}' LIMIT 10", conn)
+            
+            #consulta sql
+            query=f"Select * from '{tablas_combo.get()}' LIMIT 10"
+            consult=f"Select * from '{tablas_combo.get()}'"
+            df_preview = pd.read_sql(query, conn)
+            
             vista.config(state='normal')
             vista.delete("1.0", tk.END)
+            vista.insert(tk.END, f"Consulta SQL:\n{consult}\n\n")
             vista.insert(tk.END, df_preview.to_string(index=False))
             vista.config(state='disabled')
     except Exception as e:
