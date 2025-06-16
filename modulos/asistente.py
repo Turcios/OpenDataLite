@@ -13,7 +13,8 @@ from io import BytesIO
 from datetime import datetime
 from modulos.idioma import obtener_texto
 from modulos.utils import obtener_ruta_recurso
-
+import threading
+import matplotlib
 
 # Contexto global para almacenar el nombre de la base de datos seleccionada
 db_context = {"nombre_bd": None}
@@ -73,6 +74,15 @@ def cargar_columnas(tablas_combo, columnas_x_combo, columnas_y_combo,vista):
     except Exception as e:
         messagebox.showerror(obtener_texto("error"), f"{obtener_texto('no_column_select')} {e}")
 
+def generar_grafico_async(*args):
+    threading.Thread(target=generar_grafico, args=args, daemon=True).start()
+
+def reducir_muestra(df, max_filas=1000):
+    if len(df) > max_filas:
+        return df.sample(n=max_filas)
+    return df
+
+
 def generar_grafico(tablas_combo, columnas_x_combo, columnas_y_combo, tipo_grafico, frame_grafico, volver_btn):
     #Genera un gráfico basado en la selección del usuario.
     global fig_actual
@@ -86,6 +96,7 @@ def generar_grafico(tablas_combo, columnas_x_combo, columnas_y_combo, tipo_grafi
     try:
         df = pd.read_sql(f"SELECT * FROM '{tablas_combo.get()}'", sqlite3.connect(var.nombre_bd))
         df_actual = df.copy()
+        df = reducir_muestra(df) #reduce si hay demasiadas filas
     except Exception as e:
         messagebox.showerror(obtener_texto("error"), f"{obtener_texto('error_reading_table')}: {e}")
         return
@@ -274,7 +285,7 @@ def abrir_wizard(frame_graficos):
     vista.config(state="disabled")
     vista_scroll.config(command=vista.yview)
 
-    generar_btn = ttk.Button(vista_y_boton_frame, text=obtener_texto("generate_chart"), command=lambda: generar_grafico(tabla, columna_x, columna_y, tipo_grafico, grafico_frame, volver_btn))
+    generar_btn = ttk.Button(vista_y_boton_frame, text=obtener_texto("generate_chart"), command=lambda: generar_grafico_async(tabla, columna_x, columna_y, tipo_grafico, grafico_frame, volver_btn))
     generar_btn.grid(row=1, column=0, sticky="ew", pady=(10,0))
 
     # ------- GRAFICO ABAJO ----------
@@ -343,6 +354,8 @@ def insertar_tabla(fig, df_page):
     tabla.scale(1, 1.5)
 
 
+
+
 def exportar_pdf():
     global fig_actual, df_actual
 
@@ -358,25 +371,26 @@ def exportar_pdf():
     )
     if not file_path:
         return
+    #muestra de 100 filas
+    df_muestra = df_actual.sample(n=100) if len(df_actual) > 100 else df_actual.copy()
 
-    with PdfPages(file_path) as pdf:
+    try:
+        with PdfPages(file_path) as pdf:
         # Página del gráfico
-        crear_pagina_con_encabezado(pdf, insertar_grafico, fig_actual)
+            crear_pagina_con_encabezado(pdf, insertar_grafico, fig_actual)
 
         # Páginas de tabla
-        rows_per_page = 25
-        num_pages = int(np.ceil(len(df_actual) / rows_per_page))
+            rows_per_page = 25
+            num_pages = int(np.ceil(len(df_muestra) / rows_per_page))
 
-        for page in range(num_pages):
-            start = page * rows_per_page
-            end = start + rows_per_page
-            df_page = df_actual.iloc[start:end]
-            crear_pagina_con_encabezado(pdf, insertar_tabla, df_page)
-
-    messagebox.showinfo(obtener_texto("success"), f"{obtener_texto('success_pdf')}:\n{file_path}")
-
-
-           
+            for page in range(num_pages):
+                start = page * rows_per_page
+                end = start + rows_per_page
+                df_page = df_muestra.iloc[start:end]
+                crear_pagina_con_encabezado(pdf, insertar_tabla, df_page)
+        messagebox.showinfo("PDF generado", f"El PDF se ha guardado correctamente en:\n{file_path}")
+    except Exception as e:
+        messagebox.showerror("Error", f"Ocurrió un error al generar el PDF:\n{e}")       
 
 # Aplicación principal
 if __name__ == "__main__":
