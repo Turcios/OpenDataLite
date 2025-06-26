@@ -33,13 +33,13 @@ def obtener_datos_bd(nombre_bd, tabla):
         with sqlite3.connect(nombre_bd) as conn:
             return pd.read_sql_query(f"SELECT * FROM {tabla}", conn)
     except Exception as e:
-        messagebox.showerror(obtener_texto("error"), f"{obtener_texto('warning_no_db_selected')}: {e}")
+        messagebox.showerror(obtener_texto('error'), f"{obtener_texto('warning_no_db_selected')}: {e}")
         return None
 
 def cargar_tablas(tablas_combo):
     #Carga las tablas de la base de datos seleccionada y las muestra en el Dropdown.
     if not var.nombre_bd:
-        messagebox.showwarning(obtener_texto("warning"),obtener_texto('do_not_select_db'))
+        messagebox.showwarning(obtener_texto('warning'),obtener_texto('do_not_select_db'))
         return
     try:
         with sqlite3.connect(var.nombre_bd) as conn:
@@ -48,12 +48,12 @@ def cargar_tablas(tablas_combo):
             if not tablas.empty:
                 tablas_combo.current(0)
     except Exception as e:
-        messagebox.showerror(obtener_texto("error"), f"{obtener_texto('error_load_table')} {e}")
+        messagebox.showerror(obtener_texto('error'), f"{obtener_texto('error_load_table')} {e}")
 
 def cargar_columnas(tablas_combo, columnas_x_combo, columnas_y_combo,vista):
     #Carga las columnas de la tabla seleccionada y las muestra en los Dropdowns de ejes X e Y.
     if not var.nombre_bd or not tablas_combo.get():
-        messagebox.showwarning(obtener_texto("warning"), obtener_texto("select_database_table"))
+        messagebox.showwarning(obtener_texto('warning'), obtener_texto('select_database_table'))
         return
     try:
         with sqlite3.connect(var.nombre_bd) as conn:
@@ -76,7 +76,7 @@ def cargar_columnas(tablas_combo, columnas_x_combo, columnas_y_combo,vista):
             vista.insert(tk.END, df_preview.to_string(index=False))
             vista.config(state='disabled')
     except Exception as e:
-        messagebox.showerror(obtener_texto("error"), f"{obtener_texto('no_column_select')} {e}")
+        messagebox.showerror(obtener_texto('error'), f"{obtener_texto('no_column_select')} {e}")
 
 def generar_grafico_async(*args):
     threading.Thread(target=generar_grafico, args=args, daemon=True).start()
@@ -94,7 +94,7 @@ def generar_grafico(tablas_combo, columnas_x_combo, columnas_y_combo, tipo_grafi
     
 
     if not all([var.nombre_bd, tablas_combo.get(), columnas_y_combo.get()]):
-        messagebox.showwarning(obtener_texto("warning"), obtener_texto('select_table_columns'))
+        messagebox.showwarning(obtener_texto('warning'), obtener_texto('select_table_columns'))
         return
 
     try:
@@ -102,20 +102,20 @@ def generar_grafico(tablas_combo, columnas_x_combo, columnas_y_combo, tipo_grafi
         df_actual = df.copy()
         df = reducir_muestra(df) #reduce si hay demasiadas filas
     except Exception as e:
-        messagebox.showerror(obtener_texto("error"), f"{obtener_texto('error_reading_table')}: {e}")
+        messagebox.showerror(obtener_texto('error'), f"{obtener_texto('error_reading_table')}: {e}")
         return
 
     if df.empty or columnas_y_combo.get() not in df:
-        messagebox.showwarning(obtener_texto("warning"),obtener_texto('Insufficient_data_graph'))
+        messagebox.showwarning(obtener_texto('warning'),obtener_texto('Insufficient_data_graph'))
         return
 
     if tipo_grafico.get() == "Histograma":
         if not pd.api.types.is_numeric_dtype(df[columnas_y_combo.get()]):
-            messagebox.showerror(obtener_texto("error"), f"La columna '{columnas_y_combo.get()}' no es numérica.")
+            messagebox.showerror(obtener_texto('error'), obtener_texto('column_not_numeric').format(col=columnas_y_combo.get()))
             return
     else:
         if columnas_x_combo.get() not in df:
-            messagebox.showwarning(obtener_texto("warning"),obtener_texto('Insufficient_data_graph'))
+            messagebox.showwarning(obtener_texto('warning'),obtener_texto('Insufficient_data_graph'))
             return
         df[columnas_x_combo.get()] = df[columnas_x_combo.get()].astype(str)
 
@@ -139,7 +139,7 @@ def generar_grafico(tablas_combo, columnas_x_combo, columnas_y_combo, tipo_grafi
         elif tipo_grafico.get() == "Histograma":
             df[columnas_y_combo.get()].plot(kind="hist", bins=10, ax=ax, edgecolor='black')
     except Exception as e:
-        messagebox.showerror(obtener_texto("error"), f"{obtener_texto('error_generate_chart')} {e}")
+        messagebox.showerror(obtener_texto('error'), f"{obtener_texto('error_generate_chart')} {e}")
         return
 
     ax.set_title(f"{tipo_grafico.get()} de {columnas_y_combo.get()}")
@@ -149,7 +149,7 @@ def generar_grafico(tablas_combo, columnas_x_combo, columnas_y_combo, tipo_grafi
         ax.tick_params(axis='x', rotation=45)
     elif tipo_grafico.get() == "Histograma":
         ax.set_xlabel(columnas_y_combo.get())
-        ax.set_ylabel("Frecuencia")
+        ax.set_ylabel(obtener_texto('frequency'))
 
     plt.tight_layout()
     canvas = FigureCanvasTkAgg(fig, master=frame_grafico)
@@ -207,7 +207,7 @@ def abrir_wizard(frame_graficos):
     contenedor.rowconfigure(1, weight=1)
     
     # -------- FORMULARIO CON SCROLLBAR ----------
-    formulario_frame = ttk.LabelFrame(contenedor, text=obtener_texto("configuration"), padding=0)
+    formulario_frame = ttk.LabelFrame(contenedor, text=obtener_texto('configuration'), padding=0)
     formulario_frame.grid(row=0, column=0, sticky="nsew", padx=(0,10), pady=(0,10))
 
     formulario_canvas = tk.Canvas(formulario_frame, borderwidth=0, highlightthickness=0)
@@ -234,23 +234,23 @@ def abrir_wizard(frame_graficos):
     # ------- WIDGETS del formulario -------
     formulario_interior.columnconfigure(0, weight=1)
 
-    ttk.Button(formulario_interior, text=obtener_texto("load_tables"), command=lambda: cargar_tablas(tablas_combo)).grid(row=0, column=0, sticky="ew", pady=5)
+    ttk.Button(formulario_interior, text=obtener_texto('load_tables'), command=lambda: cargar_tablas(tablas_combo)).grid(row=0, column=0, sticky="ew", pady=5)
 
-    ttk.Label(formulario_interior, text=obtener_texto("table")).grid(row=1, column=0, sticky="w", pady=(10,2))
+    ttk.Label(formulario_interior, text=obtener_texto('table')).grid(row=1, column=0, sticky="w", pady=(10,2))
     tablas_combo = ttk.Combobox(formulario_interior, textvariable=tabla, state="readonly")
     tablas_combo.grid(row=2, column=0, sticky="ew", pady=2)
 
-    ttk.Button(formulario_interior, text=obtener_texto("load_column"), command=lambda: cargar_columnas(tabla, columnas_x_combo, columnas_y_combo, vista)).grid(row=3, column=0, sticky="ew", pady=10)
+    ttk.Button(formulario_interior, text=obtener_texto('load_column'), command=lambda: cargar_columnas(tabla, columnas_x_combo, columnas_y_combo, vista)).grid(row=3, column=0, sticky="ew", pady=10)
 
-    ttk.Label(formulario_interior, text=obtener_texto("column_x")).grid(row=4, column=0, sticky="w", pady=(10,2))
+    ttk.Label(formulario_interior, text=obtener_texto('column_x')).grid(row=4, column=0, sticky="w", pady=(10,2))
     columnas_x_combo = ttk.Combobox(formulario_interior, textvariable=columna_x, state="readonly")
     columnas_x_combo.grid(row=5, column=0, sticky="ew", pady=2)
 
-    ttk.Label(formulario_interior, text=obtener_texto("column_y")).grid(row=6, column=0, sticky="w", pady=(10,2))
+    ttk.Label(formulario_interior, text=obtener_texto('column_y')).grid(row=6, column=0, sticky="w", pady=(10,2))
     columnas_y_combo = ttk.Combobox(formulario_interior, textvariable=columna_y, state="readonly")
     columnas_y_combo.grid(row=7, column=0, sticky="ew", pady=2)
 
-    ttk.Label(formulario_interior, text=obtener_texto("chart_type")).grid(row=8, column=0, sticky="w", pady=(10,2))
+    ttk.Label(formulario_interior, text=obtener_texto('chart_type')).grid(row=8, column=0, sticky="w", pady=(10,2))
 
     tipo_grafico_frame = ttk.Frame(formulario_interior)
     tipo_grafico_frame.grid(row=9, column=0, pady=5, sticky="ew")
@@ -267,7 +267,7 @@ def abrir_wizard(frame_graficos):
         else:
             print(f"Imagen tipo {tipo} no carga. Se omite botón.")
 
-    volver_btn = ttk.Button(formulario_interior, text="← Volver", command=lambda: volver(frame_graficos))
+    volver_btn = ttk.Button(formulario_interior, text=obtener_texto('back'), command=lambda: volver(frame_graficos))
     volver_btn.grid(row=10, column=0, pady=15)
     volver_btn.grid_remove()
 
@@ -278,7 +278,7 @@ def abrir_wizard(frame_graficos):
     vista_y_boton_frame.columnconfigure(0, weight=1)
     vista_y_boton_frame.rowconfigure(0, weight=1)
 
-    vista_frame = ttk.LabelFrame(vista_y_boton_frame, text=obtener_texto("query_preview"), padding=10)
+    vista_frame = ttk.LabelFrame(vista_y_boton_frame, text=obtener_texto('query_preview'), padding=10)
     vista_frame.grid(row=0, column=0, sticky="nsew", padx=30, pady=5)
 
     vista_scroll = ttk.Scrollbar(vista_frame)
@@ -289,11 +289,11 @@ def abrir_wizard(frame_graficos):
     vista.config(state="disabled")
     vista_scroll.config(command=vista.yview)
 
-    generar_btn = ttk.Button(vista_y_boton_frame, text=obtener_texto("generate_chart"), command=lambda: generar_grafico_async(tabla, columna_x, columna_y, tipo_grafico, grafico_frame, volver_btn))
+    generar_btn = ttk.Button(vista_y_boton_frame, text=obtener_texto('generate_chart'), command=lambda: generar_grafico_async(tabla, columna_x, columna_y, tipo_grafico, grafico_frame, volver_btn))
     generar_btn.grid(row=1, column=0, sticky="ew", pady=(10,0))
 
     # ------- GRAFICO ABAJO ----------
-    grafico_frame = ttk.LabelFrame(contenedor, text=obtener_texto("chart"), padding=(10, 10))
+    grafico_frame = ttk.LabelFrame(contenedor, text=obtener_texto('chart'), padding=(10, 10))
     grafico_frame.grid(row=1, column=0, columnspan=2, sticky="nsew")
     grafico_frame.configure(height=300)
     grafico_frame.pack_propagate(False)
@@ -364,14 +364,14 @@ def exportar_pdf():
     global fig_actual, df_actual
 
     if fig_actual is None or df_actual is None:
-        messagebox.showwarning(obtener_texto("warning"), obtener_texto("generate_graph_first"))
+        messagebox.showwarning(obtener_texto('warning'), obtener_texto('generate_graph_first'))
         return
 
     # Elegir dónde guardar el PDF
     file_path = filedialog.asksaveasfilename(
         defaultextension=".pdf",
         filetypes=[("PDF Files", "*.pdf")],
-        title=obtener_texto("save_report")
+        title=obtener_texto('save_report')
     )
     if not file_path:
         return
@@ -392,14 +392,15 @@ def exportar_pdf():
                 end = start + rows_per_page
                 df_page = df_muestra.iloc[start:end]
                 crear_pagina_con_encabezado(pdf, insertar_tabla, df_page)
-        messagebox.showinfo("PDF generado", f"El PDF se ha guardado correctamente en:\n{file_path}")
+        messagebox.showinfo(obtener_texto('success'), f"{obtener_texto('success_pdf')}\n{file_path}")
     except Exception as e:
-        messagebox.showerror("Error", f"Ocurrió un error al generar el PDF:\n{e}")       
+        messagebox.showerror(obtener_texto('error'), f"{obtener_texto('pdf_error')}\n{e}")       
+
 
 # Aplicación principal
 if __name__ == "__main__":
     root = tk.Tk()
-    root.title(obtener_texto("visualizing_charts"))
+    root.title(obtener_texto('visualizing_charts'))
     root.geometry("900x600")
 
     abrir_wizard(root)

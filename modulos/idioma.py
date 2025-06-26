@@ -89,7 +89,12 @@ IDIOMAS = {
         'visualizing_charts': 'Visualizando gráficos (método agrupación)',
         'export_query': 'Exportar Consulta',
         'export_results': 'Exportar Resultados',
-        'export_chart_PDF':'Exportar Gráfico a PDF'
+        'export_chart_PDF':'Exportar Gráfico a PDF',
+        'column_not_numeric': "La columna '{col}' no es numérica.",
+        'pdf_generated': 'PDF generado correctamente',
+        'back': '← Volver',
+        'pdf_error': 'Ocurrió un error al generar el PDF:'
+            
     },
     'en': {
         'table': 'Table:',
@@ -181,7 +186,12 @@ IDIOMAS = {
         'visualizing_charts': 'Visualizing Charts(Grouping Method)',
         'export_query': 'Export Query',
         'export_results': 'Export Results',
-        'export_chart_PDF':'Export Chart to PDF'
+        'export_chart_PDF':'Export Chart to PDF',
+        'column_not_numeric': "The column '{col}' is not numeric.",
+        'pdf_generated': 'PDF generated successfully',
+        'back': '← Back',        
+        'pdf_error': 'An error occurred while generating the PDF:',
+
     }
 } 
 
