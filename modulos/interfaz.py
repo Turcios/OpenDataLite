@@ -179,6 +179,10 @@ class InterfazApp:
         self.root.config(menu=barra_menu)
 
     def mostrar_asistente(self):
+        #Limpia widgets de graficos
+        for widget in self.frame_graficos.winfo_children():
+            widget.destroy()
+        
         self.notebook.select(self.frame_graficos)
         abrir_wizard(self.frame_graficos)
         
@@ -270,4 +274,11 @@ class InterfazApp:
 def cambiar_idioma_y_actualizar(app, idioma):
     # Cambia el idioma y actualiza los textos del menú.
     cambiar_idioma(idioma)
+    #Limpia widgets de graficos
+    for widget in app.frame_graficos.winfo_children():
+        widget.destroy()
+        
     app.actualizar_textos_interface()
+
+    #reconstruye automaticamente el widgets de graficos
+    app.mostrar_asistente()
