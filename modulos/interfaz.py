@@ -195,7 +195,7 @@ class InterfazApp:
     def mostrar_acerca_de(self):
         self.ventana = Toplevel()
         self.ventana.title("Acerca de OpenDataLite")
-        self.ventana.geometry("400x500")
+        self.ventana.geometry("500x600")
         self.ventana.resizable(False, False)
         icono_path = obtener_ruta_recurso("logo.ico")
         self.ventana.iconbitmap(icono_path)
@@ -211,6 +211,7 @@ class InterfazApp:
 
         # Texto del "Acerca de"
         texto = (
+            "Universidad Nacional de Costa Rica\n\n"
             "Proyecto de Licenciatura:\n"
             "OpenDataLite\n\n"
             "Por:\n"
