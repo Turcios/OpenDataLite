@@ -20,4 +20,5 @@ Resultado:
     - Ícono del instalador: SetupIconFile=logo.ico
     - Nombre del instalador: OpenDataLite_Instalador.exe
     - Accesos directos y carpeta de instalación
+- Se presiona build y luego compilar y esperamos a que se genere el ejecutable.
 
