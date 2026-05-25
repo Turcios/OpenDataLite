@@ -10,3 +10,7 @@ En este proyecto, se desarrollará una aplicación de escritorio de código abie
  # Instalar matplotlib
 
  pip install matplotlib
+
+ # Licencia
+
+Este proyecto está bajo la licencia MIT.
