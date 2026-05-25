@@ -25,3 +25,7 @@ En este proyecto, se desarrollará una aplicación de escritorio de código abie
  pip install PyQt5
 
  pip install tk
+
+## Licencia
+
+Este proyecto está bajo la licencia MIT.
